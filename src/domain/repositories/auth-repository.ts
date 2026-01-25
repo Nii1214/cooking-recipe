@@ -1,4 +1,4 @@
-import { SignupInput, User } from "@/src/types/auth";
+import { SignupInput, User } from "@/types/auth";
 
 export interface AuthRepository {
     signup(input: SignupInput): Promise<User>;

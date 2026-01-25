@@ -1,7 +1,7 @@
 // ドメインエンティティ(アプリ内ユーザー情報)
 export type User = {
-    id: string,
-    email: string,
+    id: string;
+    email: string;
     createdAt: Date;
 };
 

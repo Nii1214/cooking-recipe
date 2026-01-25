@@ -1,9 +1,8 @@
-import { SignupUseCase } from "@/src/infrastructure/auth/signup.usecase";
-import { AuthRepositoryImpl } from "@/src/infrastructure/repositories/auth-repository-impl";
-import { SignupResult } from "@/src/types/auth";
+'use server';
+import { SignupUseCase } from "@/usecase/auth/signup.usecase";
+import { AuthRepositoryImpl } from "@/infrastructure/repositories/auth-repository-impl";
+import { SignupResult } from "@/types/auth";
 import { redirect } from "next/navigation";
-
-`use server`;
 
 export async function signupAction(
     _prevState: SignupResult | null,

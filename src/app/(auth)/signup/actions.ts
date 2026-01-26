@@ -17,7 +17,7 @@ export async function signupAction(
 
     const result = await useCase.execute({ email , password});
     if(result.success) {
-        redirect('/top');
+        redirect('/signup/verify-email');
     }
     return result;
 }

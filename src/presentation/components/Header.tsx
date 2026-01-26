@@ -2,12 +2,12 @@
 export default function Header() {
     return (
         <>
-            <header className="h-16 flex items-center justify-between bg-white px-6">
+            <header className="fixed top-0 left-0 right-0 z-50 h-16 flex items-center justify-between bg-white px-6">
                 <div className="flex items-center gap-8">
                     <span className="font-bold text-xl tracking-tight shrink-0">Cooking Recipe</span>
-                    <input 
+                    <input
                         type="text"
-                        placeholder="なにつくる？"
+                        placeholder="なにつくる？（実装予定）"
                         className="w-full bg-gray-50 border border-gray-200 rounded-full py-2 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-orange-200 transition-all"
                     />
                 </div>

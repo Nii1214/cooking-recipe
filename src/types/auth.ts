@@ -15,3 +15,14 @@ export type SignupInput = {
 export type SignupResult = 
     | { success: true; user: User}
     | { success: false; error: string};
+
+// ログイン用の入力データ
+export type LoginInput = {
+    email: string,
+    password: string,
+}
+
+// ログイン用出力データ(Resultパターン)
+export type LoginResult = 
+    | {success: true; user: User}
+    | {success: false; error: string}

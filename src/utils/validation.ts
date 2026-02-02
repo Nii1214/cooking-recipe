@@ -19,8 +19,6 @@
  * ```
  */
 export function isValidEmail(email: string): boolean {
-    // RFC 5322 の簡易版（実務では十分）
-    // より厳密な検証が必要な場合は、ライブラリ（例: validator.js）を使用
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 

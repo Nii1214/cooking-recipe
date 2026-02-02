@@ -1,40 +1,29 @@
-import { AuthRepository } from "@/domain/repositories/auth-repository";
-import { LoginInput, LoginResult } from "@/types/auth";
-import { getAuthErrorMessage } from "@/utils/auth-error-handler";
+import { AuthRepository, LoginInput } from "@/domain/repositories/auth-repository";
+import { LoginResult } from "@/types/auth";
+import { isPasswordNotEmpty, isValidEmail } from "@/utils/validation";
+
 
 export class LoginUseCase {
     constructor(private authRepository: AuthRepository){}
 
     async execute(input: LoginInput): Promise<LoginResult> {
-        try {
-            // メールアドレス形式チェック
-            if(!this.isValidEmail(input.email)) {
-                return {
-                    success:false,
-                    error: 'メールアドレスの形式が正しくありません'
-                };
-            }
-
-            // パスワードが空でないかチェック
-            if(input.password.length === 0){
-                return {
-                    success: false,
-                    error: 'パスワードを入力してください'
-                }
-            }
-
-            const user = await this.authRepository.login(input);
-            return { success: true, user};
-        }catch (error) {
-            const errorMessage = getAuthErrorMessage(error);
+        // メールアドレス形式チェック
+        if(!isValidEmail(input.email)) {
             return {
-                success: false,
-                error: errorMessage
+                success:false,
+                error: 'メールアドレスの形式が正しくありません'
             };
         }
-    }
 
-    private isValidEmail(email: string): boolean {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        // パスワードが空でないかチェック
+        if(!isPasswordNotEmpty(input.password)){
+            return {
+                success: false,
+                error: 'パスワードを入力してください'
+            }
+        }
+
+        const user = await this.authRepository.login(input);
+        return { success: true, user};
     }
 }

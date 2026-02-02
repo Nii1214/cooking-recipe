@@ -1,6 +1,5 @@
-import { AuthRepository } from "@/domain/repositories/auth-repository";
+import { AuthRepository, LoginInput, SignupInput, User } from "@/domain/repositories/auth-repository";
 import { createClient } from "@/lib/supabase/server";
-import { LoginInput, SignupInput, User } from "@/types/auth";
 
 export class AuthRepositoryImpl implements AuthRepository {
     async signup(input: SignupInput): Promise<User> {

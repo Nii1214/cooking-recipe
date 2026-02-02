@@ -1,28 +1,11 @@
-// ドメインエンティティ(アプリ内ユーザー情報)
-export type User = {
-    id: string;
-    email: string;
-    createdAt: Date;
-};
-
-// 入力データ
-export type SignupInput = {
-    email: string;
-    password: string;
-};
+import { User } from "@/domain/repositories/auth-repository";
 
 // 出力データ(Resultパターン)
-export type SignupResult = 
-    | { success: true; user: User}
-    | { success: false; error: string};
-
-// ログイン用の入力データ
-export type LoginInput = {
-    email: string,
-    password: string,
-}
+export type SignupResult =
+    | { success: true; user: User }
+    | { success: false; error: string };
 
 // ログイン用出力データ(Resultパターン)
-export type LoginResult = 
-    | {success: true; user: User}
-    | {success: false; error: string}
+export type LoginResult =
+    | { success: true; user: User }
+    | { success: false; error: string }

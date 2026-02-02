@@ -1,5 +1,6 @@
 'use server';
 import { AuthRepositoryImpl } from "@/infrastructure/repositories/auth-repository-impl";
+import { getAuthErrorMessage } from "@/infrastructure/utils/auth-error-handler";
 import { LoginResult } from "@/types/auth";
 import { LoginUseCase } from "@/usecase/auth/login.usecase";
 import { redirect } from "next/navigation";
@@ -16,12 +17,20 @@ export async function loginAction (
     const repository = new AuthRepositoryImpl();
     const useCase = new LoginUseCase(repository);
 
-    const result = await useCase.execute({ email, password });
+    try {
+        const result = await useCase.execute({ email, password });
 
-    if(result.success){
-        //ログイン成功時にトップページへリダイレクト
-        redirect('/top');
+        if(result.success){
+            //ログイン成功時にトップページへリダイレクト
+            redirect('/top');
+        }
+
+        return result;
+    } catch(error) {
+        return {
+            success: false,
+            error: getAuthErrorMessage(error),
+        }
     }
-
-    return result;
+    
 }

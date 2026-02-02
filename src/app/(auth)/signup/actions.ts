@@ -3,6 +3,7 @@ import { SignupUseCase } from "@/usecase/auth/signup.usecase";
 import { AuthRepositoryImpl } from "@/infrastructure/repositories/auth-repository-impl";
 import { SignupResult } from "@/types/auth";
 import { redirect } from "next/navigation";
+import { getAuthErrorMessage } from "@/infrastructure/utils/auth-error-handler";
 
 export async function signupAction(
     _prevState: SignupResult | null,
@@ -15,9 +16,16 @@ export async function signupAction(
     const repository = new AuthRepositoryImpl();
     const useCase = new SignupUseCase(repository);
 
-    const result = await useCase.execute({ email , password});
-    if(result.success) {
-        redirect('/signup/verify-email');
+    try{
+        const result = await useCase.execute({ email , password});
+        if(result.success) {
+            redirect('/signup/verify-email');
+        }
+        return result;
+    }catch(error) {
+        return {
+            success: false,
+            error: getAuthErrorMessage(error),
+        };
     }
-    return result;
 }

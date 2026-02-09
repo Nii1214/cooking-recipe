@@ -12,11 +12,11 @@ export class AuthRepositoryImpl implements AuthRepository {
 
         // エラーチェック
         if(error) {
-            throw new Error(`Signup failed:${error.message}`);
+            throw error;
         }
         // nullチェック
         if(!data.user) {
-            throw new Error('ユーザー作成に失敗しました');
+            throw new Error('SIGNUP_FAILED');
         }
 
         return {
@@ -36,12 +36,12 @@ export class AuthRepositoryImpl implements AuthRepository {
 
         // エラーチェック
         if(error) {
-            throw new Error(`Login failed: ${error.message}`);
+            throw error;
         }
 
         // nullチェック
         if(!data.user) {
-            throw new Error('ログインに失敗しました');
+            throw new Error('LOGIN_FAILED');
         }
 
         return {

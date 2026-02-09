@@ -1,5 +1,5 @@
 'use client';
-import { signupAction } from "@/app/(auth)/signup/actions";
+import { signupAction } from "@/app/(auth)/signup/signup.action";
 import { SignupResult } from "@/types/auth";
 import { useActionState, useState } from "react";
 

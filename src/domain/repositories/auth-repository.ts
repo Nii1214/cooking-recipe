@@ -11,8 +11,8 @@ export type SignupInput = {
 };
 // ログイン用の入力データ
 export type LoginInput = {
-    email: string,
-    password: string,
+    email: string;
+    password: string;
 }
 
 export interface AuthRepository {

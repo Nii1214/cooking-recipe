@@ -2,12 +2,46 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { signupAction } from './signup.action';
 import { AuthRepository } from '@/domain/repositories/auth-repository';
 import { DIContainer } from '@/lib/di-container';
+import { SignupResult } from '@/types/auth';
 
 vi.mock('next/navigation', () => ({
   redirect: vi.fn((path: string) => {
     throw new Error(`REDIRECT:${path}`);
   }),
 }));
+
+/**
+ * エラー結果を検証するアサーション関数
+ * 関数実行後、resultは { success: false; error: string } 型に絞り込まれる
+ * @param result - 検証する結果
+ * @param expectedError - 期待するエラーメッセージ
+ */
+function expectErrorResult(
+    result: SignupResult,
+    expectedError: string
+): asserts result is { success: false; error: string } {
+    expect(result.success).toBe(false);
+    if (result.success) {
+        throw new Error('Expected error result but got success result');
+    }
+    expect(result.error).toBe(expectedError);
+}
+
+/**
+ * エラー結果が存在することを検証するアサーション関数
+ * 関数実行後、resultは { success: false; error: string } 型に絞り込まれる
+ * @param result - 検証する結果
+ */
+function expectErrorResultExists(
+    result: SignupResult
+): asserts result is { success: false; error: string } {
+    expect(result.success).toBe(false);
+    if (result.success) {
+        throw new Error('Expected error result but got success result');
+    }
+    expect(result.error).toBeTruthy();
+    expect(typeof result.error).toBe('string');
+}
 
 describe('signupAction(サインアップ処理)', () => {
   let mockRepository: AuthRepository;
@@ -53,8 +87,7 @@ describe('signupAction(サインアップ処理)', () => {
 
     const result = await signupAction(null, formData);
 
-    expect(result.success).toBe(false);
-    expect(result.error).toBe('メールアドレスの形式が正しくありません');
+    expectErrorResult(result, 'メールアドレスの形式が正しくありません');
     expect(mockRepository.signup).not.toHaveBeenCalled();
   });
 
@@ -65,8 +98,7 @@ describe('signupAction(サインアップ処理)', () => {
 
     const result = await signupAction(null, formData);
 
-    expect(result.success).toBe(false);
-    expect(result.error).toBe('パスワードは8文字以上で入力してください');
+    expectErrorResult(result, 'パスワードは8文字以上で入力してください');
     expect(mockRepository.signup).not.toHaveBeenCalled();
   });
 
@@ -97,8 +129,6 @@ describe('signupAction(サインアップ処理)', () => {
 
     const result = await signupAction(null, formData);
 
-    expect(result.success).toBe(false);
-    expect(result.error).toBeTruthy();
-    expect(typeof result.error).toBe('string');
+    expectErrorResultExists(result);
   });
 });

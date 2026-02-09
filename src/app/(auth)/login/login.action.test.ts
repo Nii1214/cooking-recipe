@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { loginAction } from "./login.action";
 import { AuthRepository } from "@/domain/repositories/auth-repository";
 import { DIContainer } from "@/lib/di-container";
+import { LoginResult } from "@/types/auth";
 
 vi.mock('next/navigation', () => ({
     redirect: vi.fn((path: string) => {
@@ -10,7 +11,40 @@ vi.mock('next/navigation', () => ({
     }),
 }));
 
-describe('loginAction(ログイン処理)',() => {
+/**
+ * エラー結果を検証するアサーション関数
+ * 関数実行後、resultは { success: false; error: string } 型に絞り込まれる
+ * @param result - 検証する結果
+ * @param expectedError - 期待するエラーメッセージ
+ */
+function expectErrorResult(
+    result: LoginResult,
+    expectedError: string
+): asserts result is { success: false; error: string } {
+    expect(result.success).toBe(false);
+    if (result.success) {
+        throw new Error('Expected error result but got success result');
+    }
+    expect(result.error).toBe(expectedError);
+}
+
+/**
+ * エラー結果が存在することを検証するアサーション関数
+ * 関数実行後、resultは { success: false; error: string } 型に絞り込まれる
+ * @param result - 検証する結果
+ */
+function expectErrorResultExists(
+    result: LoginResult
+): asserts result is { success: false; error: string } {
+    expect(result.success).toBe(false);
+    if (result.success) {
+        throw new Error('Expected error result but got success result');
+    }
+    expect(result.error).toBeTruthy();
+    expect(typeof result.error).toBe('string');
+}
+
+describe('loginAction(ログイン処理)', () => {
     let mockRepository: AuthRepository;
 
     beforeEach(() => {
@@ -26,7 +60,7 @@ describe('loginAction(ログイン処理)',() => {
         DIContainer.setAuthRepositoryForTesting(mockRepository);
     });
 
-    it('ログイン成功時に/topへリダイレクトする',async() => {
+    it('ログイン成功時に/topへリダイレクトする', async () => {
         // Repositoryのモックを設定
         vi.mocked(mockRepository.login).mockResolvedValue({
             id: 'test-id',
@@ -38,7 +72,7 @@ describe('loginAction(ログイン処理)',() => {
         formData.append('email', 'test@example.com');
         formData.append('password', 'password123');
 
-        await expect(loginAction(null,formData)).rejects.toThrow('REDIRECT:/top');
+        await expect(loginAction(null, formData)).rejects.toThrow('REDIRECT:/top');
 
         // Repositoryのloginが正しい引数で呼ばれたことを検証
         expect(mockRepository.login).toHaveBeenCalledWith({
@@ -59,8 +93,7 @@ describe('loginAction(ログイン処理)',() => {
 
         const result = await loginAction(null, formData);
 
-        expect(result.success).toBe(false);
-        expect(result.error).toBeTruthy();
+        expectErrorResultExists(result);
     });
 
     it('メールアドレス形式が不正な場合にバリデーションエラー', async () => {
@@ -71,9 +104,8 @@ describe('loginAction(ログイン処理)',() => {
 
         const result = await loginAction(null, formData);
 
-        expect(result.success).toBe(false);
-        expect(result.error).toBe('メールアドレスの形式が正しくありません');
-        
+        expectErrorResult(result, 'メールアドレスの形式が正しくありません');
+
         // Repositoryが呼ばれていないことを検証
         expect(mockRepository.login).not.toHaveBeenCalled();
     });
@@ -85,8 +117,7 @@ describe('loginAction(ログイン処理)',() => {
 
         const result = await loginAction(null, formData);
 
-        expect(result.success).toBe(false);
-        expect(result.error).toBe('パスワードを入力してください');
+        expectErrorResult(result, 'パスワードを入力してください');
         expect(mockRepository.login).not.toHaveBeenCalled();
     });
 

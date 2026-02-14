@@ -1,11 +1,11 @@
 import { AuthError } from "@supabase/supabase-js";
 import { describe, expect, it } from "vitest";
 import { getAuthErrorMessage } from "./auth-error-handler";
-
+//npm run test -- src/infrastructure/utils/auth-error-handler.test.ts
 describe('getAuthMessage(認証エラーメッセージ変換',() => {
     describe('エラーコードから直接変換',() => {
         it('エラーコードから直接変換',() => {
-            const error = new AuthError('Email exits',400,'email_exits');
+            const error = new AuthError('Email exists',400,'email_exists');
             expect(getAuthErrorMessage(error)).toBe('このメールアドレスは既に登録されています');
         });
 

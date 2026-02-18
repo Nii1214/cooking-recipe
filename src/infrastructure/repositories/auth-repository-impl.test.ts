@@ -12,7 +12,13 @@ vi.mock('@/lib/supabase/server', () => ({
   
 describe('AuthRepositoryImpl', () => {
     let repository: AuthRepositoryImpl;
-    let mockSupabaseClient: any;
+    type MockSupabaseClient = {
+      auth: {
+        signUp: ReturnType<typeof vi.fn>;
+        signInWithPassword: ReturnType<typeof vi.fn>;
+      };
+    };
+    let mockSupabaseClient: MockSupabaseClient;
   
   beforeEach(() => {
     vi.clearAllMocks();
@@ -27,7 +33,9 @@ describe('AuthRepositoryImpl', () => {
     };
 
     // createClientがモックSupabaseを返すように設定
-    vi.mocked(createClient).mockResolvedValue(mockSupabaseClient);
+    vi.mocked(createClient).mockResolvedValue(
+      mockSupabaseClient as unknown as Awaited<ReturnType<typeof createClient>>
+    );
   });
   
     describe('signup(サインアップ)', () => {
@@ -149,13 +157,6 @@ describe('AuthRepositoryImpl', () => {
             password: 'password123',
           })
         ).rejects.toThrow('LOGIN_FAILED');
-      });
-    });
-  
-    describe('findByEmail', () => {
-      it('現在はnullを返す（将来の拡張用）', async () => {
-        const result = await repository.findByEmail('test@example.com');
-        expect(result).toBeNull();
       });
     });
 });

@@ -50,9 +50,4 @@ export class AuthRepositoryImpl implements AuthRepository {
             createdAt: new Date(data.user.created_at),
         };
     }
-
-    async findByEmail(email: string) : Promise<User | null> {
-        // カスタムロジックが必要な場合のみ追加
-        return null;
-    }
 }

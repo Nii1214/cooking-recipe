@@ -18,5 +18,4 @@ export type LoginInput = {
 export interface AuthRepository {
     signup(input: SignupInput): Promise<User>;
     login(input: LoginInput) : Promise<User>;
-    findByEmail(email: string): Promise<User | null>;
 }

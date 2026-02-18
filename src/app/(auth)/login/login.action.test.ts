@@ -57,7 +57,6 @@ describe('loginAction(ログイン処理)', () => {
         mockRepository = {
             login: vi.fn(),
             signup: vi.fn(),
-            findByEmail: vi.fn(),
         } as AuthRepository;
 
         DIContainer.setAuthRepositoryForTesting(mockRepository);

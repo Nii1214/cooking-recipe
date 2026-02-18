@@ -16,7 +16,6 @@ describe('SignupUseCase', () => {
     mockRepo = {
       login: vi.fn(),
       signup: vi.fn().mockResolvedValue(mockUser),
-      findByEmail: vi.fn(),
     };
   });
 

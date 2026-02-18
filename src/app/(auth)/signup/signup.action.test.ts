@@ -3,10 +3,14 @@ import { signupAction } from './signup.action';
 import { AuthRepository } from '@/domain/repositories/auth-repository';
 import { DIContainer } from '@/lib/di-container';
 import { SignupResult } from '@/types/auth';
+import { redirect } from 'next/navigation';
 
+/** Next.js の redirect() と同じ形の例外を投げる（action の isRedirectError で判定される） */
 vi.mock('next/navigation', () => ({
   redirect: vi.fn((path: string) => {
-    throw new Error(`REDIRECT:${path}`);
+    const err = new Error('NEXT_REDIRECT') as Error & { digest: string };
+    err.digest = `NEXT_REDIRECT;replace;${path};307;`;
+    throw err;
   }),
 }));
 
@@ -70,9 +74,8 @@ describe('signupAction(サインアップ処理)', () => {
     formData.append('email', 'newuser@example.com');
     formData.append('password', 'password123');
 
-    await expect(signupAction(null, formData)).rejects.toThrow(
-      'REDIRECT:/signup/verify-email'
-    );
+    await expect(signupAction(null, formData)).rejects.toThrow('NEXT_REDIRECT');
+    expect(vi.mocked(redirect)).toHaveBeenCalledWith('/signup/verify-email');
 
     expect(mockRepository.signup).toHaveBeenCalledWith({
       email: 'newuser@example.com',
@@ -113,9 +116,7 @@ describe('signupAction(サインアップ処理)', () => {
     formData.append('email', 'test@example.com');
     formData.append('password', '12345678');
 
-    await expect(signupAction(null, formData)).rejects.toThrow(
-      'REDIRECT:/signup/verify-email'
-    );
+    await expect(signupAction(null, formData)).rejects.toThrow('NEXT_REDIRECT');
   });
 
   it('予期しないエラー時にエラーハンドラーを通してメッセージを返す', async () => {

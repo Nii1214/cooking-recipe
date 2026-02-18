@@ -1,13 +1,16 @@
-import { LoginUseCase } from "@/usecase/auth/login.usecase";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { loginAction } from "./login.action";
 import { AuthRepository } from "@/domain/repositories/auth-repository";
 import { DIContainer } from "@/lib/di-container";
 import { LoginResult } from "@/types/auth";
+import { redirect } from "next/navigation";
 
+/** Next.js の redirect() と同じ形の例外を投げる（action の isRedirectError で判定される） */
 vi.mock('next/navigation', () => ({
     redirect: vi.fn((path: string) => {
-        throw new Error(`REDIRECT:${path}`);
+        const err = new Error('NEXT_REDIRECT') as Error & { digest: string };
+        err.digest = `NEXT_REDIRECT;replace;${path};307;`;
+        throw err;
     }),
 }));
 
@@ -72,9 +75,9 @@ describe('loginAction(ログイン処理)', () => {
         formData.append('email', 'test@example.com');
         formData.append('password', 'password123');
 
-        await expect(loginAction(null, formData)).rejects.toThrow('REDIRECT:/top');
+        await expect(loginAction(null, formData)).rejects.toThrow('NEXT_REDIRECT');
+        expect(vi.mocked(redirect)).toHaveBeenCalledWith('/top');
 
-        // Repositoryのloginが正しい引数で呼ばれたことを検証
         expect(mockRepository.login).toHaveBeenCalledWith({
             email: 'test@example.com',
             password: 'password123',

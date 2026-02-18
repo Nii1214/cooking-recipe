@@ -3,6 +3,7 @@ import { SignupResult } from "@/types/auth";
 import { redirect } from "next/navigation";
 import { getAuthErrorMessage } from "@/infrastructure/utils/auth-error-handler";
 import { DIContainer } from "@/lib/di-container";
+import { isRedirectError } from "@/utils/redirect";
 
 export async function signupAction(
     _prevState: SignupResult | null,
@@ -25,7 +26,10 @@ export async function signupAction(
             redirect('/signup/verify-email');
         }
         return result;
-    }catch(error) {
+    } catch (error) {
+        if (isRedirectError(error)) {
+            throw error;
+        }
         return {
             success: false,
             error: getAuthErrorMessage(error),

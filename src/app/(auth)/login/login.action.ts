@@ -3,11 +3,12 @@ import { getAuthErrorMessage } from "@/infrastructure/utils/auth-error-handler";
 import { DIContainer } from "@/lib/di-container";
 import { LoginResult } from "@/types/auth";
 import { redirect } from "next/navigation";
+import { isRedirectError } from "@/utils/redirect";
 
-export async function loginAction (
+export async function loginAction(
     _prevState: LoginResult | null,
     formData: FormData
-):Promise<LoginResult> {
+): Promise<LoginResult> {
 
     const email = formData.get('email') as string | null;
     const password = formData.get('password') as string | null;
@@ -15,21 +16,23 @@ export async function loginAction (
     const useCase = DIContainer.getLoginUseCase();
 
     try {
-        const result = await useCase.execute({ 
-            email: email ?? '', 
-            password: password ?? '' 
+        const result = await useCase.execute({
+            email: email ?? '',
+            password: password ?? ''
         });
 
-        // 3. 成功時のリダイレクト
-        if(result.success){ 
-            redirect('/top'); 
+        if (result.success) {
+            redirect('/top');
         }
 
         return result;
-    } catch(error) {
+    } catch (error) {
+        if (isRedirectError(error)) {
+            throw error;
+        }
         return {
             success: false,
             error: getAuthErrorMessage(error),
-        }
+        };
     }
 }

@@ -22,7 +22,7 @@ public/assets/
 public/static/
 
 # ドキュメント類（ファイル数が多い場合は無視）
-docs/
+
 
 # ログファイル
 *.log

@@ -132,4 +132,18 @@ describe('loginAction(ログイン処理)', () => {
         expect(result.success).toBe(false);
         expect(mockRepository.login).not.toHaveBeenCalled();
     });
+
+    it('予期しないエラー時にエラーハンドラーを通してメッセージを返す', async () => {
+        vi.mocked(mockRepository.login).mockRejectedValue(
+            new Error('Database error')
+        );
+
+        const formData = new FormData();
+        formData.append('email', 'test@example.com');
+        formData.append('password', 'password123');
+
+        const result = await loginAction(null, formData);
+
+        expectErrorResultExists(result);
+    });
 });

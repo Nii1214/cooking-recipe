@@ -1,11 +1,9 @@
 import { User } from "@/domain/repositories/auth-repository";
 
-// 出力データ(Resultパターン)
-export type SignupResult =
+export type AuthResult =
     | { success: true; user: User }
     | { success: false; error: string };
 
-// ログイン用出力データ(Resultパターン)
-export type LoginResult =
-    | { success: true; user: User }
-    | { success: false; error: string }
+// エイリアス
+export type SignupResult = AuthResult;
+export type LoginResult = AuthResult;

@@ -12,11 +12,11 @@ export class AuthRepositoryImpl implements AuthRepository {
 
         // エラーチェック
         if(error) {
-            throw new Error(`Signup failed:${error.message}`);
+            throw error;
         }
         // nullチェック
         if(!data.user) {
-            throw new Error('ユーザー作成に失敗しました');
+            throw new Error('SIGNUP_FAILED');
         }
 
         return {
@@ -36,12 +36,12 @@ export class AuthRepositoryImpl implements AuthRepository {
 
         // エラーチェック
         if(error) {
-            throw new Error(`Login failed: ${error.message}`);
+            throw error;
         }
 
         // nullチェック
         if(!data.user) {
-            throw new Error('ログインに失敗しました');
+            throw new Error('LOGIN_FAILED');
         }
 
         return {
@@ -49,10 +49,5 @@ export class AuthRepositoryImpl implements AuthRepository {
             email: data.user.email!,
             createdAt: new Date(data.user.created_at),
         };
-    }
-
-    async findByEmail(email: string) : Promise<User | null> {
-        // カスタムロジックが必要な場合のみ追加
-        return null;
     }
 }

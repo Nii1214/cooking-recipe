@@ -11,12 +11,11 @@ export type SignupInput = {
 };
 // ログイン用の入力データ
 export type LoginInput = {
-    email: string,
-    password: string,
+    email: string;
+    password: string;
 }
 
 export interface AuthRepository {
     signup(input: SignupInput): Promise<User>;
     login(input: LoginInput) : Promise<User>;
-    findByEmail(email: string): Promise<User | null>;
 }

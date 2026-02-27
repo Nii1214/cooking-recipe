@@ -1,114 +1,187 @@
-# 味を継承するファミリーカプセルクッキング（FCC）
+# 家族の味と思い出を一緒に残す『ファミリー味帳』
 
-## 設計
-### クリーンアーキテクチャ
-今回はクリーンアーキテクチャ（レイヤードアーキテクチャ風）を採用しました。
+## Overview
 
-#### 採用理由
-- 各処理の「関心分離」を深く理解するため
-データの永続化とビジネスロジック、UIの責務分離を体感してフロントエンドの設計についての理解を深めたいと考えました。
-- 設計思想の学習と実践のため
-ただ動くものではなく、依存性の逆転などの設計原則をプロジェクトに落とし込むことで、保守性の高いコードを書く基礎体力をつけようと考えました。
-- 小中規模開発における「最適な設計の勘所」を掴むため
-あえて過度に細かく分割する経験を通じ、実務においてどの程度の抽象化が適切かのバランス感覚を養いたいと考えました。
-- 生成AI活用によるコーディングコスト低下による将来性を考慮
-クリーンアーキテクチャの弱点であった実装コストが解決されつつあり、生成AIが理解しやすく、ハルシネーションを起こしにくい分割されたコードが将来的なコスト削減につながると考えました。
+Family Recipe Archive は、  
+「家族の味と記憶を保存・継承するためのクローズドなレシピアプリ」です。
 
-#### アーキテクチャ図（依存関係）
+単なるレシピ管理ツールではなく、
 
-依存の向きは **presentation → usecase → domain** および **app → infrastructure** を守ります。内側の層は外側の層に依存しません。
+- 家族の思い出
+- 失敗も含めた料理体験
+- 写真とともに残す日常
+- 世代を超えた味の継承
 
-```mermaid
-flowchart TB
-    subgraph outer["外側（フレームワーク・ドライバ）"]
-        app["app\nルーティング・Server Actions・ページ"]
-        presentation["presentation\nUIコンポーネント"]
-        infrastructure["infrastructure\nリポジトリ実装・外部API連携"]
-    end
+を目的としたプロダクトです。
 
-    subgraph inner["内側（ビジネスロジック）"]
-        usecase["usecase\nユースケース"]
-        domain["domain\nエンティティ・リポジトリIF"]
-    end
+---
 
-    subgraph shared["共有"]
-        types["types\n型定義（Result等）"]
-        utils["utils\n汎用ユーティリティ"]
-        lib["lib\n外部ライブラリ初期化"]
-    end
+## Why This Product Exists
 
-    app --> usecase
-    app --> infrastructure
-    app --> presentation
-    app --> types
-    presentation --> types
-    usecase --> domain
-    usecase --> types
-    usecase --> utils
-    infrastructure --> domain
-    infrastructure --> lib
-```
+料理は、誰しもが関わる営みです。
 
-- **app**: コンポジションルート。UseCase と Repository を組み立て、Server Action でエラー変換などを行う。
-- **usecase**: domain（リポジトリインターフェース）のみに依存。infrastructure は import しない。
-- **domain**: 他レイヤーに依存しない最内層。
-- **infrastructure**: domain のインターフェースを実装し、Supabase 等の外部システムと連携する。
+しかし、
 
-#### ディレクトリ構成図
+- 結婚や引越しで家族が疎遠になる
+- 親世代が亡くなり、味が再現できなくなる
+- 離乳食などセンシティブなレシピを安全に共有したい
 
-```
-src/
-├── app/                    # Next.js App Router・Server Actions
-│   ├── (auth)/login/       # ログイン
-│   ├── (auth)/signup/      # サインアップ
-│   └── top/                # トップページ
-├── presentation/           # プレゼンテーション層（UI）
-│   └── components/
-├── usecase/                # ユースケース層
-│   └── auth/
-├── domain/                 # ドメイン層
-│   └── repositories/      # リポジトリインターフェース・エンティティ
-├── infrastructure/         # インフラストラクチャ層
-│   ├── repositories/      # リポジトリ実装
-│   └── utils/             # インフラ固有ユーティリティ（例: エラー変換）
-├── types/                  # 型定義（Result 等）
-├── lib/                    # 外部ライブラリの設定・クライアント
-└── utils/                  # 汎用ユーティリティ（Supabase 非依存のバリデーション等）
-```
+といった課題があります。
 
-#### 各層の責務
+本プロダクトは、
 
-| 層 | 責務 | 依存してよいもの |
-|----|------|------------------|
-| **app** | ルーティング、ページ、Server Actions。UseCase と Repository の組み立て（DI） | usecase, infrastructure, presentation, types |
-| **presentation** | 再利用可能な UI コンポーネント | types, app の Action |
-| **usecase** | アプリケーション固有のビジネスロジック（バリデーション、リポジトリ呼び出し） | domain, types, utils（Supabase 非依存） |
-| **domain** | エンティティ、リポジトリインターフェース、ドメインの型 | なし（最内層） |
-| **infrastructure** | リポジトリ実装、外部 API・DB 連携、Supabase 固有のエラー変換など | domain, lib |
-| **types** | アプリ全体で使う型（Result パターン等）。ドメインの User を参照可 | domain |
-| **utils** | 汎用ユーティリティ（バリデーション等）。Supabase に依存しない純粋関数 | なし |
-| **lib** | Supabase クライアント等の初期化 | なし |
+> 「料理」という共通体験を通じて、  
+> 家族のつながりを保存・再構築すること
 
-#### データの流れ（認証の例）
+を目的としています。
 
-1. ユーザーがフォーム送信 → **presentation** のコンポーネントが **app** の Server Action を呼ぶ。
-2. **app** が `AuthRepositoryImpl` と `LoginUseCase` を組み立て、`useCase.execute(input)` を実行。
-3. **usecase** がバリデーション（utils/validation）を行い、**domain** の `AuthRepository` インターフェース経由でログイン処理を依頼。
-4. **infrastructure** の `AuthRepositoryImpl` が Supabase と通信し、結果を返す。
-5. 例外時は **app** の try/catch で `infrastructure/utils` のエラー変換を呼び、ユーザー向けメッセージを返す。
+---
 
-## 実装したい内容
-- ログイン機能
-  - 未ログイン時のリダイレクト処理をミドルウェアで作成
-- ユーザー登録機能
-  - ユーザー登録時のメール確認完了後のコールバック機能
-- トップページ
-  - お知らせ掲示板
-- レシピ一覧
-  - レシピ登録
-  - レシピ修正
-  - レシピ削除
+## Core Concept
 
-## 将来的に実装したい内容
-- 買い物リスト機能
-  - レシピから追加する機能も追加予定
+### 1. Closed Environment
+
+本アプリは家族単位で完全に分離された空間を提供します。
+
+- 他家族のデータにはアクセス不可
+- 家族単位でデータを管理
+- センシティブな内容（離乳食など）も安心して保存可能
+
+安心を最優先に設計しています。
+
+---
+
+### 2. Family-Owned Data
+
+レシピは「個人の所有物」ではなく  
+「家族の資産」として扱います。
+
+- レシピの所有者は内部家族
+- 個人死亡による断絶を防ぐ設計
+- 招待済み家族には継続的にアクセス可能
+
+家族全員が亡くなった場合の削除は想定しますが、  
+基本思想は「保存」です。
+
+---
+
+### 3. Memory-Oriented Design
+
+保存できるもの：
+
+- レシピ
+- 失敗談
+- 思い出エピソード
+- 写真
+- 将来的にはコメント機能
+
+料理越しに孫の写真を見る、  
+教えてもらったレシピを再現する、  
+そんなコミュニケーションを想定しています。
+
+---
+
+## Architecture
+
+### Tech Stack
+
+- Next.js (App Router)
+- Clean Architecture
+- Supabase (PostgreSQL + Auth + Storage)
+- Vercel (Hosting)
+
+---
+
+### Architectural Principles
+
+#### 1. Clean Architecture
+
+- Domain層を中心に設計
+- UseCase層でビジネスロジック管理
+- Infrastructure層でSupabase依存を隔離
+- Server ActionはUseCase呼び出しのみ
+
+将来的な技術変更に耐えられる構造を採用しています。
+
+---
+
+#### 2. Multi-Tenant Design
+
+- family_id によるデータ分離
+- Supabase RLSによるアクセス制御
+- ドメイン層での整合性チェック（二重防御）
+
+セキュリティをインフラとドメインの両方で担保しています。
+
+---
+
+#### 3. Storage Strategy
+
+画像データは長期保存を前提とします。
+
+- 将来的なストレージ移行を考慮した抽象化
+- 画像最適化
+- エクスポート機能の実装予定
+
+---
+
+## Data Permanence Strategy
+
+本プロダクトは「Write Once, Read Forever」型の設計です。
+
+考慮していること：
+
+- バックアップ戦略
+- PDFエクスポート機能
+- 将来的なJSONエクスポート
+- サービス終了時のデータ持ち出し可能性
+
+ユーザーのデータ主権を重視します。
+
+---
+
+## Monetization Policy
+
+テーマの特性上、慎重に設計します。
+
+基本方針：
+
+- データ販売は行わない
+- 行動トラッキング広告は行わない
+- 信頼を損なう収益化はしない
+
+検討中：
+
+- 家族単位の保存料モデル
+- ストレージ容量課金
+- PDF製本オプション
+
+収益よりも「信頼」を優先します。
+
+---
+
+## Future Vision
+
+スケールは目的ではありません。
+
+- 小さくても長く続くこと
+- ドメインは極力変更しない
+- 開発者がいなくなっても継承可能な設計
+
+を目指しています。
+
+---
+
+## Author's Intent
+
+このプロダクトは、
+
+- 技術的挑戦
+- 長期設計の実験
+- 永続性と倫理の両立
+
+を目的としたプロジェクトでもあります。
+
+家族の味は、消耗品ではなく「記憶資産」である。
+
+それを守るための設計を行っています。

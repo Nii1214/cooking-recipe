@@ -228,7 +228,6 @@ export function RecipeCreateForm() {
             <div className="space-y-8">
                 {/* セクション: レシピ総合 */}
                 <section className="space-y-4">
-                    <h2 className="text-base font-semibold text-gray-900 border-b border-gray-200 pb-2">レシピ総合</h2>
                     <div className="space-y-3">
                         <div>
                             <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">料理名 <span className="text-red-500">*</span></label>
@@ -318,12 +317,7 @@ export function RecipeCreateForm() {
 
                 {/* セクション: 材料 */}
                 <section className="space-y-3">
-                    <div className="flex items-center justify-between border-b border-gray-200 pb-2">
-                        <h2 className="text-base font-semibold text-gray-900">材料 <span className="text-red-500">*</span></h2>
-                        <button type="button" onClick={addIngredient} className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
-                            <Plus className="h-4 w-4" /> 追加
-                        </button>
-                    </div>
+                    <h2 className="text-base font-semibold text-gray-900 border-b border-gray-200 pb-2">材料 <span className="text-red-500">*</span></h2>
                     <div className="space-y-2">
                         {ingredients.map((ing, index) => (
                             <div
@@ -350,17 +344,15 @@ export function RecipeCreateForm() {
                             </div>
                         ))}
                     </div>
+                    <button type="button" onClick={addIngredient} className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg border-2 border-dashed border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-600 hover:border-gray-400 hover:bg-gray-50">
+                        <Plus className="h-4 w-4" /> 材料を追加
+                    </button>
                     <p className="text-xs text-gray-500">ドラッグ&ドロップで順番を入れ替えられます</p>
                 </section>
 
                 {/* セクション: 手順 */}
                 <section className="space-y-3">
-                    <div className="flex items-center justify-between border-b border-gray-200 pb-2">
-                        <h2 className="text-base font-semibold text-gray-900">手順</h2>
-                        <button type="button" onClick={addInstruction} className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
-                            <Plus className="h-4 w-4" /> 追加
-                        </button>
-                    </div>
+                    <h2 className="text-base font-semibold text-gray-900 border-b border-gray-200 pb-2">作り方</h2>
                     <div className="space-y-2">
                         {instructions.map((inst, index) => (
                             <div
@@ -371,62 +363,71 @@ export function RecipeCreateForm() {
                                 onDrop={(e) => handleInstructionDrop(e, index)}
                                 onDragEnd={() => setInstructionDraggedIndex(null)}
                                 className={[
-                                    "rounded-lg border transition-all bg-white overflow-hidden",
+                                    "rounded-lg border transition-all bg-white overflow-hidden flex items-stretch",
                                     instructionDraggedIndex === index ? "border-blue-500 bg-blue-50/30 opacity-80" : "border-gray-200 hover:border-gray-300",
                                 ].join(" ")}
                             >
-                                <div className="flex items-start gap-3 p-3">
-                                    <div className="cursor-move text-gray-400 hover:text-gray-600 shrink-0 w-6 text-center text-sm font-medium text-gray-500 pt-2">{inst.stepNumber}</div>
-                                    <div className="cursor-move shrink-0 text-gray-400 pt-2"><GripVertical className="h-5 w-5" /></div>
-                                    {instructions.length > 1 && (
-                                        <button type="button" onClick={() => removeInstruction(inst.id)} className="rounded p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600 shrink-0 mt-1 ml-auto" aria-label="手順を削除"><X className="h-4 w-4" /></button>
-                                    )}
+                                {/* 左: ドラッグアイコンのみ */}
+                                <div className="flex items-center shrink-0 w-10 py-3 pl-3 pr-2 border-r border-gray-100 bg-gray-50/50 cursor-move justify-center">
+                                    <GripVertical className="h-5 w-5 text-gray-400 hover:text-gray-600" />
                                 </div>
-                                <div className="rounded-b-lg border-t border-gray-100 bg-gray-50/50 p-4 space-y-4">
-                                    <textarea
-                                        value={inst.description}
-                                        onChange={(e) => setInstructions((prev) => prev.map((v) => (v.id === inst.id ? { ...v, description: e.target.value } : v)))}
-                                        placeholder="手順の説明を入力"
-                                        rows={5}
-                                        className="w-full min-h-[120px] rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y"
-                                    />
-                                    <div className="space-y-3">
-                                        {inst.images.length > 0 && (
-                                            <div className="space-y-3">
-                                                {inst.images.map((img, imgIndex) => (
-                                                    <div key={imgIndex} className="relative w-full aspect-video max-h-64 rounded-lg border border-gray-200 overflow-hidden bg-gray-100">
-                                                        <img src={img.preview} alt={`手順${inst.stepNumber}の画像${imgIndex + 1}`} className="w-full h-full object-contain" />
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => removeInstructionImage(inst.id, imgIndex)}
-                                                            className="absolute top-2 right-2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70"
-                                                            aria-label="画像を削除"
-                                                        >
-                                                            <X className="h-4 w-4" />
-                                                        </button>
-                                                    </div>
-                                                ))}
-                                            </div>
+                                {/* 右: ヘッダー + 手順本文・画像・画像追加エリア */}
+                                <div className="flex-1 min-w-0 flex flex-col">
+                                    <div className="flex items-center justify-between px-4 pt-3 pb-1 border-b border-gray-100">
+                                        <span className="text-sm font-semibold text-gray-700 tabular-nums">手順 {inst.stepNumber}</span>
+                                        {instructions.length > 1 && (
+                                            <button type="button" onClick={() => removeInstruction(inst.id)} className="rounded p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600" aria-label="手順を削除"><X className="h-4 w-4" /></button>
                                         )}
-                                        <label className="w-full min-h-[5rem] rounded-lg border-2 border-dashed border-gray-300 bg-white flex flex-col items-center justify-center gap-2 text-gray-400 hover:text-gray-600 hover:border-gray-400 hover:bg-gray-50/80 cursor-pointer transition-colors py-6">
-                                            <ImageIcon className="h-8 w-8" />
-                                            <span className="text-sm font-medium">画像を追加</span>
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                className="hidden"
-                                                onChange={(e) => {
-                                                    const file = e.target.files?.[0];
-                                                    if (file) addInstructionImage(inst.id, file);
-                                                    e.target.value = "";
-                                                }}
-                                            />
-                                        </label>
+                                    </div>
+                                    <div className="p-4 space-y-4">
+                                        <textarea
+                                            value={inst.description}
+                                            onChange={(e) => setInstructions((prev) => prev.map((v) => (v.id === inst.id ? { ...v, description: e.target.value } : v)))}
+                                            placeholder="手順の説明を入力"
+                                            rows={5}
+                                            className="w-full min-h-[120px] rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y"
+                                        />
+                                        <div className="space-y-3">
+                                            {inst.images.length > 0 && (
+                                                <div className="space-y-3">
+                                                    {inst.images.map((img, imgIndex) => (
+                                                        <div key={imgIndex} className="relative w-full aspect-video max-h-64 rounded-lg border border-gray-200 overflow-hidden bg-gray-100">
+                                                            <img src={img.preview} alt={`手順${inst.stepNumber}の画像${imgIndex + 1}`} className="w-full h-full object-contain" />
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => removeInstructionImage(inst.id, imgIndex)}
+                                                                className="absolute top-2 right-2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70"
+                                                                aria-label="画像を削除"
+                                                            >
+                                                                <X className="h-4 w-4" />
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                            <label className="w-full min-h-[5rem] rounded-lg border-2 border-dashed border-gray-300 bg-white flex flex-col items-center justify-center gap-2 text-gray-400 hover:text-gray-600 hover:border-gray-400 hover:bg-gray-50/80 cursor-pointer transition-colors py-6">
+                                                <ImageIcon className="h-8 w-8" />
+                                                <span className="text-sm font-medium">画像を追加</span>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="hidden"
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) addInstructionImage(inst.id, file);
+                                                        e.target.value = "";
+                                                    }}
+                                                />
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         ))}
                     </div>
+                    <button type="button" onClick={addInstruction} className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg border-2 border-dashed border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-600 hover:border-gray-400 hover:bg-gray-50">
+                        <Plus className="h-4 w-4" /> 手順を追加
+                    </button>
                     <p className="text-xs text-gray-500">ドラッグ&ドロップで順番を入れ替えられます</p>
                 </section>
 

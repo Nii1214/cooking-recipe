@@ -1,3 +1,4 @@
+import type { Recipe } from "@/domain/models/recipe/recipe";
 import { CategoryInput } from "./category-repository";
 import { IngredientInput } from "./ingredient-repository";
 import { InstructionInput } from "./instrucsion-repository";
@@ -15,4 +16,15 @@ export type RecipeInput = {
     authorId: string;
     createdAt: Date;
     updatedAt: Date;
-}
+};
+
+/** レシピ作成時の入力。id / authorId / createdAt / updatedAt はサーバーで付与する。 */
+export type CreateRecipeInput = Omit<
+  RecipeInput,
+  "id" | "authorId" | "createdAt" | "updatedAt"
+>;
+
+/** レシピ作成の結果 */
+export type CreateRecipeResult =
+  | { success: true; recipe: Recipe }
+  | { success: false; error: string };

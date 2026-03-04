@@ -1,6 +1,10 @@
 "use client";
 
 import { Image as ImageIcon, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 type Props = {
     title: string;
@@ -28,67 +32,63 @@ export function RecipeGeneralSection({
     return (
         <section className="space-y-4">
             <div className="space-y-3">
-                <div>
-                    <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-                        料理名 <span className="text-red-500">*</span>
-                    </label>
-                    <input
+                <div className="space-y-2">
+                    <Label htmlFor="title">
+                        料理名 <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
                         id="title"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         required
-                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="例: 祖母の肉じゃが"
                     />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">料理の画像</label>
+                    <div className="space-y-2">
+                        <Label>料理の画像</Label>
                         {imagePreview ? (
                             <div className="relative">
-                                <img src={imagePreview} alt="Preview" className="w-full h-40 object-cover rounded-lg" />
-                                <button
+                                <img src={imagePreview} alt="Preview" className="w-full h-40 object-cover rounded-md" />
+                                <Button
                                     type="button"
+                                    variant="secondary"
+                                    size="icon"
                                     onClick={onImageClear}
-                                    className="absolute top-2 right-2 rounded-full bg-black/50 p-1.5 text-white hover:bg-black/70"
+                                    className="absolute top-2 right-2 rounded-full bg-black/50 text-white hover:bg-black/70 size-8"
                                 >
-                                    <X className="h-4 w-4" />
-                                </button>
+                                    <X className="size-4" />
+                                </Button>
                             </div>
                         ) : (
-                            <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                                <ImageIcon className="h-10 w-10 text-gray-400 mb-2" />
-                                <span className="text-sm text-gray-600">画像をアップロード</span>
+                            <Label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-input rounded-md cursor-pointer hover:bg-accent/50 transition-colors">
+                                <ImageIcon className="size-10 text-muted-foreground mb-2" />
+                                <span className="text-sm text-muted-foreground">画像をアップロード</span>
                                 <input type="file" accept="image/*" className="hidden" onChange={onImageChange} />
-                            </label>
+                            </Label>
                         )}
                     </div>
-                    <div>
-                        <label htmlFor="minutes" className="block text-sm font-medium text-gray-700 mb-1">
-                            調理時間（分）
-                        </label>
-                        <input
+                    <div className="space-y-2">
+                        <Label htmlFor="minutes">調理時間（分）</Label>
+                        <Input
                             id="minutes"
                             type="number"
                             inputMode="numeric"
                             value={minutes}
                             onChange={(e) => setMinutes(e.target.value === "" ? "" : Number(e.target.value))}
-                            min="1"
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            min={1}
                             placeholder="例: 30"
                         />
                     </div>
                 </div>
-                <div>
-                    <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-1">
-                        レシピコメント
-                    </label>
-                    <textarea
+                <div className="space-y-2">
+                    <Label htmlFor="comment">レシピコメント</Label>
+                    <Textarea
                         id="comment"
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
                         rows={3}
-                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                        className="resize-none"
                         placeholder="例: 甘めの味付けでほっとする定番。思い出の味。"
                     />
                 </div>

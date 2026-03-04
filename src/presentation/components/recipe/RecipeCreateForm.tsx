@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import type { IngredientUI, InstructionUI } from "./recipe-create-types";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { RecipeCategorySection } from "./RecipeCategorySection";
 import { RecipeGeneralSection } from "./RecipeGeneralSection";
 import { RecipeIngredientsSection } from "./RecipeIngredientsSection";
@@ -95,7 +97,6 @@ export function RecipeCreateForm() {
 
     return (
         <form
-            className="rounded-xl bg-white p-6 shadow-sm border border-gray-100"
             onSubmit={(e) => {
                 e.preventDefault();
                 console.log("Submit(UIのみ):", {
@@ -109,7 +110,8 @@ export function RecipeCreateForm() {
                 });
             }}
         >
-            <div className="space-y-8">
+            <Card className="p-6">
+                <CardContent className="pt-0 space-y-8">
                 <RecipeGeneralSection
                     title={title}
                     setTitle={setTitle}
@@ -143,21 +145,19 @@ export function RecipeCreateForm() {
                     onRemoveInstruction={removeInstruction}
                 />
 
-                <section className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-4 border-t border-gray-200">
-                    <button
-                        type="button"
-                        className="rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 order-2 sm:order-1"
-                    >
+                <section className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-4 border-t border-border">
+                    <Button type="button" variant="outline" className="order-2 sm:order-1">
                         下書き保存（未実装）
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         type="submit"
-                        className="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 order-1 sm:order-2"
+                        className="order-1 sm:order-2 bg-emerald-600 hover:bg-emerald-700 focus-visible:ring-emerald-500"
                     >
                         レシピを登録（未接続）
-                    </button>
+                    </Button>
                 </section>
-            </div>
+                </CardContent>
+            </Card>
         </form>
     );
 }

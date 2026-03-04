@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { GripVertical, Image as ImageIcon, Plus, X } from "lucide-react";
 import type { InstructionUI } from "./recipe-create-types";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 
 type Props = {
     instructions: InstructionUI[];
@@ -49,7 +52,7 @@ export function RecipeInstructionsSection({
 
     return (
         <section className="space-y-3">
-            <h2 className="text-base font-semibold text-gray-900 border-b border-gray-200 pb-2">作り方</h2>
+            <h2 className="text-base font-semibold text-foreground border-b border-border pb-2">作り方</h2>
             <div className="space-y-2">
                 {instructions.map((inst, index) => (
                     <div
@@ -59,34 +62,36 @@ export function RecipeInstructionsSection({
                         onDragOver={handleDragOver}
                         onDrop={(e) => handleInstructionDrop(e, index)}
                         onDragEnd={() => setInstructionDraggedIndex(null)}
-                        className={[
-                            "rounded-lg border transition-all bg-white overflow-hidden flex items-stretch",
+                        className={cn(
+                            "rounded-lg border transition-all bg-card overflow-hidden flex items-stretch",
                             instructionDraggedIndex === index
-                                ? "border-blue-500 bg-blue-50/30 opacity-80"
-                                : "border-gray-200 hover:border-gray-300",
-                        ].join(" ")}
+                                ? "border-primary bg-primary/5 opacity-80"
+                                : "border-border hover:border-muted-foreground/50"
+                        )}
                     >
-                        <div className="flex items-center shrink-0 w-10 py-3 pl-3 pr-2 border-r border-gray-100 bg-gray-50/50 cursor-move justify-center">
-                            <GripVertical className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                        <div className="flex items-center shrink-0 w-10 py-3 pl-3 pr-2 border-r border-border bg-muted/30 cursor-move justify-center">
+                            <GripVertical className="size-5 text-muted-foreground hover:text-foreground" />
                         </div>
                         <div className="flex-1 min-w-0 flex flex-col">
-                            <div className="flex items-center justify-between px-4 pt-3 pb-1 border-b border-gray-100">
-                                <span className="text-sm font-semibold text-gray-700 tabular-nums">
+                            <div className="flex items-center justify-between px-4 pt-3 pb-1 border-b border-border">
+                                <span className="text-sm font-semibold text-foreground tabular-nums">
                                     手順 {inst.stepNumber}
                                 </span>
                                 {instructions.length > 1 && (
-                                    <button
+                                    <Button
                                         type="button"
+                                        variant="ghost"
+                                        size="icon-sm"
                                         onClick={() => onRemoveInstruction(inst.id)}
-                                        className="rounded p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600"
+                                        className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                                         aria-label="手順を削除"
                                     >
-                                        <X className="h-4 w-4" />
-                                    </button>
+                                        <X className="size-4" />
+                                    </Button>
                                 )}
                             </div>
                             <div className="p-4 space-y-4">
-                                <textarea
+                                <Textarea
                                     value={inst.description}
                                     onChange={(e) =>
                                         onInstructionsChange((prev) =>
@@ -97,7 +102,7 @@ export function RecipeInstructionsSection({
                                     }
                                     placeholder="手順の説明を入力"
                                     rows={5}
-                                    className="w-full min-h-[120px] rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y"
+                                    className="min-h-[120px] resize-y"
                                 />
                                 <div className="space-y-3">
                                     {inst.images.length > 0 && (
@@ -105,27 +110,28 @@ export function RecipeInstructionsSection({
                                             {inst.images.map((img, imgIndex) => (
                                                 <div
                                                     key={imgIndex}
-                                                    className="relative w-full aspect-video max-h-64 rounded-lg border border-gray-200 overflow-hidden bg-gray-100"
+                                                    className="relative w-full aspect-video max-h-64 rounded-lg border border-border overflow-hidden bg-muted"
                                                 >
                                                     <img
                                                         src={img.preview}
                                                         alt={`手順${inst.stepNumber}の画像${imgIndex + 1}`}
                                                         className="w-full h-full object-contain"
                                                     />
-                                                    <button
+                                                    <Button
                                                         type="button"
+                                                        size="icon"
                                                         onClick={() => onRemoveInstructionImage(inst.id, imgIndex)}
-                                                        className="absolute top-2 right-2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70"
+                                                        className="absolute top-2 right-2 rounded-full bg-black/50 text-white hover:bg-black/70 size-8"
                                                         aria-label="画像を削除"
                                                     >
-                                                        <X className="h-4 w-4" />
-                                                    </button>
+                                                        <X className="size-4" />
+                                                    </Button>
                                                 </div>
                                             ))}
                                         </div>
                                     )}
-                                    <label className="w-full min-h-[5rem] rounded-lg border-2 border-dashed border-gray-300 bg-white flex flex-col items-center justify-center gap-2 text-gray-400 hover:text-gray-600 hover:border-gray-400 hover:bg-gray-50/80 cursor-pointer transition-colors py-6">
-                                        <ImageIcon className="h-8 w-8" />
+                                    <label className="w-full min-h-[5rem] rounded-lg border-2 border-dashed border-input bg-background flex flex-col items-center justify-center gap-2 text-muted-foreground hover:text-foreground hover:border-muted-foreground/50 hover:bg-accent/50 cursor-pointer transition-colors py-6">
+                                        <ImageIcon className="size-8" />
                                         <span className="text-sm font-medium">画像を追加</span>
                                         <input
                                             type="file"
@@ -144,14 +150,10 @@ export function RecipeInstructionsSection({
                     </div>
                 ))}
             </div>
-            <button
-                type="button"
-                onClick={onAddInstruction}
-                className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg border-2 border-dashed border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-600 hover:border-gray-400 hover:bg-gray-50"
-            >
-                <Plus className="h-4 w-4" /> 手順を追加
-            </button>
-            <p className="text-xs text-gray-500">ドラッグ&ドロップで順番を入れ替えられます</p>
+            <Button type="button" variant="outline" className="w-full border-dashed" onClick={onAddInstruction}>
+                <Plus className="size-4" /> 手順を追加
+            </Button>
+            <p className="text-xs text-muted-foreground">ドラッグ&ドロップで順番を入れ替えられます</p>
         </section>
     );
 }

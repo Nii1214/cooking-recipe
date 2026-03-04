@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { GripVertical, Plus, X } from "lucide-react";
+import { GripVertical, Plus } from "lucide-react";
 import type { IngredientUI } from "./recipe-create-types";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 type Props = {
     ingredients: IngredientUI[];
@@ -46,8 +49,8 @@ export function RecipeIngredientsSection({
 
     return (
         <section className="space-y-3">
-            <h2 className="text-base font-semibold text-gray-900 border-b border-gray-200 pb-2">
-                材料 <span className="text-red-500">*</span>
+            <h2 className="text-base font-semibold text-foreground border-b border-border pb-2">
+                材料 <span className="text-destructive">*</span>
             </h2>
             <div className="space-y-2">
                 {ingredients.map((ing, index) => (
@@ -58,16 +61,16 @@ export function RecipeIngredientsSection({
                         onDragOver={handleDragOver}
                         onDrop={(e) => handleDrop(e, index)}
                         onDragEnd={handleDragEnd}
-                        className={[
-                            "flex items-center gap-3 p-3 rounded-lg border transition-all bg-white",
-                            draggedIndex === index ? "border-blue-500 bg-blue-50 opacity-80" : "border-gray-200 hover:border-gray-300",
-                        ].join(" ")}
+                        className={cn(
+                            "flex items-center gap-3 p-3 rounded-lg border transition-all bg-card",
+                            draggedIndex === index ? "border-primary bg-primary/5 opacity-80" : "border-border hover:border-muted-foreground/50"
+                        )}
                     >
-                        <div className="cursor-move text-gray-400 hover:text-gray-600 shrink-0">
-                            <GripVertical className="h-5 w-5" />
+                        <div className="cursor-move text-muted-foreground hover:text-foreground shrink-0">
+                            <GripVertical className="size-5" />
                         </div>
                         <div className="flex-1 grid grid-cols-12 gap-2 min-w-0">
-                            <input
+                            <Input
                                 value={ing.name}
                                 onChange={(e) =>
                                     onIngredientsChange((prev) =>
@@ -75,9 +78,9 @@ export function RecipeIngredientsSection({
                                     )
                                 }
                                 placeholder="材料名"
-                                className="col-span-6 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="col-span-6"
                             />
-                            <input
+                            <Input
                                 value={ing.quantity}
                                 onChange={(e) =>
                                     onIngredientsChange((prev) =>
@@ -85,9 +88,9 @@ export function RecipeIngredientsSection({
                                     )
                                 }
                                 placeholder="量"
-                                className="col-span-3 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="col-span-3"
                             />
-                            <input
+                            <Input
                                 value={ing.unit}
                                 onChange={(e) =>
                                     onIngredientsChange((prev) =>
@@ -95,29 +98,27 @@ export function RecipeIngredientsSection({
                                     )
                                 }
                                 placeholder="単位"
-                                className="col-span-2 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="col-span-2"
                             />
                         </div>
                         {ingredients.length > 1 && (
-                            <button
+                            <Button
                                 type="button"
+                                variant="ghost"
+                                size="icon-sm"
                                 onClick={() => onRemoveIngredient(ing.id)}
-                                className="rounded p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600 shrink-0"
+                                className="shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                             >
-                                <X className="h-4 w-4" />
-                            </button>
+                                ×
+                            </Button>
                         )}
                     </div>
                 ))}
             </div>
-            <button
-                type="button"
-                onClick={onAddIngredient}
-                className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg border-2 border-dashed border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-600 hover:border-gray-400 hover:bg-gray-50"
-            >
-                <Plus className="h-4 w-4" /> 材料を追加
-            </button>
-            <p className="text-xs text-gray-500">ドラッグ&ドロップで順番を入れ替えられます</p>
+            <Button type="button" variant="outline" className="w-full border-dashed" onClick={onAddIngredient}>
+                <Plus className="size-4" /> 材料を追加
+            </Button>
+            <p className="text-xs text-muted-foreground">ドラッグ&ドロップで順番を入れ替えられます</p>
         </section>
     );
 }

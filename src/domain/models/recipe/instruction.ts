@@ -1,8 +1,10 @@
 /**
- * 料理の手順
+ * レシピの調理手順
  */
 export interface Instruction {
-    stepNumber: number; // 手順番号
-    description: string;  // 説明
-    imageUrl?: string; // 各ステップの補足画像
+    /** UPDATE / DELETE に必要なため id を持つ */
+    id: string;
+    stepNumber: number;
+    description: string;
+    imageUrl?: string;
 }

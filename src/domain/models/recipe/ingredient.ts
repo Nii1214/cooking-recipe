@@ -1,11 +1,17 @@
 /**
- * 料理の材料
+ * レシピに紐づく材料
  */
 export interface Ingredient {
     id: string;
-    name: string;      // 例: 人参
-    quantity: string;  // 例: 1.5
-    unit: string;      // 例: 本、g、小さじ1
-    note?: string;     // 例: 乱切りにしておく
-    order: number;     // 並び順
+    /** 材料マスター（ingredients テーブル）への参照。未紐付けの場合は undefined */
+    ingredientId?: string;
+    /** ユーザーが入力した表示用の材料名。例: "人参（みじん切り）" */
+    name: string;
+    /** 表示用の量。"適量" や "少々" などの文字列も入る。例: "1.5", "適量" */
+    quantityDisplay: string;
+    /** 数値計算用の量。"適量" など数値化できない場合は undefined */
+    quantityValue?: number;
+    unit: string;
+    note?: string;
+    order: number;
 }

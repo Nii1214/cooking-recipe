@@ -1,5 +1,13 @@
 # 家族の味と思い出を一緒に残す『ファミリー味帳』
 
+<!-- デモ URL が確定したらここに記載してください -->
+<!-- 🔗 [デモを見る](https://your-app.vercel.app) -->
+
+**Tech Stack**:
+Next.js 16 &nbsp;|&nbsp; React 19 &nbsp;|&nbsp; TypeScript &nbsp;|&nbsp; Supabase &nbsp;|&nbsp; Tailwind CSS v4 &nbsp;|&nbsp; Vercel
+
+---
+
 ## Overview
 
 Family Recipe Archive は、  
@@ -85,10 +93,40 @@ Family Recipe Archive は、
 
 ### Tech Stack
 
-- Next.js (App Router)
-- Clean Architecture
-- Supabase (PostgreSQL + Auth + Storage)
-- Vercel (Hosting)
+| カテゴリ | 技術 | 選定理由 |
+|--------|-----|---------|
+| フレームワーク | Next.js 16（App Router） | Server Actions による型安全なサーバー処理 |
+| UI | React 19 + Tailwind CSS v4 + shadcn/ui | 高速な UI 開発と一貫したデザイン |
+| 言語 | TypeScript | 型安全性、エディタ補完によるDX向上 |
+| BaaS | Supabase（PostgreSQL + Auth + Storage） | RLS によるマルチテナント対応、コスト効率 |
+| ホスティング | Vercel | Next.js との親和性、エッジデプロイ |
+| テスト | Vitest | 高速なユニットテスト、TypeScript ネイティブ |
+
+各技術の選定詳細は [`docs/adr/`](./docs/adr/) を参照してください。
+
+---
+
+### ディレクトリ構成
+
+クリーンアーキテクチャに基づいて層ごとに分離しています。
+
+```
+src/
+├── app/              # Next.js App Router（ルーティング・Server Actions）
+├── presentation/     # UI コンポーネント
+├── usecase/          # ユースケース（機能のオーケストレーション）
+├── domain/
+│   ├── models/       # エンティティ・値オブジェクト（型）
+│   └── repositories/ # リポジトリのインターフェース（契約）
+├── infrastructure/
+│   └── repositories/ # リポジトリの実装（Supabase を使った永続化）
+├── lib/              # 外部クライアントのラッパー（Supabase 等）
+├── types/            # アプリ全体で使う型（Result 型など）
+├── utils/            # プレーンなユーティリティ（バリデーション等）
+└── constants/        # 定数（エラーメッセージ等）
+```
+
+各層の詳細なルールと設計意図は、各ディレクトリの `_README.md` に記載しています。
 
 ---
 
@@ -96,19 +134,22 @@ Family Recipe Archive は、
 
 #### 1. Clean Architecture
 
-- Domain層を中心に設計
-- UseCase層でビジネスロジック管理
-- Infrastructure層でSupabase依存を隔離
-- Server ActionはUseCase呼び出しのみ
+- Domain 層を中心に設計
+- UseCase 層でビジネスロジック管理
+- Infrastructure 層で Supabase 依存を隔離
+- Server Action は UseCase 呼び出しのみ
 
 将来的な技術変更に耐えられる構造を採用しています。
+
+> アーキテクチャの全体図・依存関係・CRUD フローの詳細:  
+> → [`docs/architect/clean-architecture-and-directory.md`](./docs/architect/clean-architecture-and-directory.md)
 
 ---
 
 #### 2. Multi-Tenant Design
 
-- family_id によるデータ分離
-- Supabase RLSによるアクセス制御
+- `family_id` によるデータ分離
+- Supabase RLS によるアクセス制御
 - ドメイン層での整合性チェック（二重防御）
 
 セキュリティをインフラとドメインの両方で担保しています。
@@ -125,6 +166,45 @@ Family Recipe Archive は、
 
 ---
 
+## Getting Started（開発環境のセットアップ）
+
+### 必要なもの
+
+- Node.js 20+
+- Supabase プロジェクト（[supabase.com](https://supabase.com) で無料作成可能）
+
+### 手順
+
+```bash
+# 1. リポジトリをクローン
+git clone https://github.com/your-username/cooking-recipe.git
+cd cooking-recipe
+
+# 2. 依存パッケージをインストール
+npm install
+
+# 3. 環境変数を設定
+cp .env.example .env.local
+# .env.local に以下を記入してください:
+#   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+#   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# 4. 開発サーバーを起動
+npm run dev
+```
+
+### テストの実行
+
+```bash
+# ウォッチモードでテスト
+npm run test
+
+# 一度だけ実行
+npm run test:run
+```
+
+---
+
 ## Data Permanence Strategy
 
 本プロダクトは「Write Once, Read Forever」型の設計です。
@@ -132,8 +212,8 @@ Family Recipe Archive は、
 考慮していること：
 
 - バックアップ戦略
-- PDFエクスポート機能
-- 将来的なJSONエクスポート
+- PDF エクスポート機能
+- 将来的な JSON エクスポート
 - サービス終了時のデータ持ち出し可能性
 
 ユーザーのデータ主権を重視します。
@@ -154,7 +234,7 @@ Family Recipe Archive は、
 
 - 家族単位の保存料モデル
 - ストレージ容量課金
-- PDF製本オプション
+- PDF 製本オプション
 
 収益よりも「信頼」を優先します。
 

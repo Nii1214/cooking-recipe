@@ -3,6 +3,7 @@ export type IngredientUI = {
     name: string;
     quantity: string;
     unit: string;
+    note?: string;
     order: number;
 };
 

@@ -15,6 +15,10 @@ export type CreateRecipeDeps = {
     recipeId: string,
     instructions: RecipeInput["instructions"]
   ) => Promise<void>;
+  saveCategories: (
+    recipeId: string,
+    categories: RecipeInput["categories"]
+  ) => Promise<void>;
 };
 
 export const createRecipeUsecase = async (
@@ -25,6 +29,7 @@ export const createRecipeUsecase = async (
   await Promise.all([
     deps.saveIngredients(recipe.id, input.ingredients),
     deps.saveInstructions(recipe.id, input.instructions),
+    deps.saveCategories(recipe.id, input.categories),
   ]);
   return recipe;
 };

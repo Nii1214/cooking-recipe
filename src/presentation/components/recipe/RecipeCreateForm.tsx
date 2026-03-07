@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import type { IngredientUI, InstructionUI } from "./recipe-create-types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,10 +9,16 @@ import { RecipeCategorySection } from "./RecipeCategorySection";
 import { RecipeGeneralSection } from "./RecipeGeneralSection";
 import { RecipeIngredientsSection } from "./RecipeIngredientsSection";
 import { RecipeInstructionsSection } from "./RecipeInstructionsSection";
+import { createRecipeAction } from "@/app/recipe/new/action";
 
 export function RecipeCreateForm() {
+    const router = useRouter();
+    const [isPending, startTransition] = useTransition();
+    const [error, setError] = useState<string | null>(null);
+
     const [title, setTitle] = useState("");
     const [minutes, setMinutes] = useState<number | "">("");
+    const [servingCount, setServingCount] = useState<number | "">("");
     const [comment, setComment] = useState("");
 
     const [imageFile, setImageFile] = useState<File | null>(null);
@@ -95,19 +102,43 @@ export function RecipeCreateForm() {
         );
     };
 
+    const buildFormData = (isDraft: boolean) => ({
+        title,
+        description: comment,
+        servingCount: Number(servingCount) || 1,
+        preparationTimeMinutes: Number(minutes) || 0,
+        isDraft,
+        categoryIds: selectedCategories,
+        ingredients: ingredients.map((ing, idx) => ({
+            name: ing.name,
+            quantity: ing.quantity,
+            unit: ing.unit,
+            note: ing.note,
+            order: idx,
+        })),
+        instructions: instructions.map((inst) => ({
+            stepNumber: inst.stepNumber,
+            description: inst.description,
+        })),
+    });
+
+    const handleSubmit = (isDraft: boolean) => {
+        setError(null);
+        startTransition(async () => {
+            const result = await createRecipeAction(buildFormData(isDraft));
+            if (result.success) {
+                router.push(`/recipe/${result.recipe.id}`);
+            } else {
+                setError(result.error);
+            }
+        });
+    };
+
     return (
         <form
             onSubmit={(e) => {
                 e.preventDefault();
-                console.log("Submit(UIのみ):", {
-                    title,
-                    minutes,
-                    comment,
-                    selectedCategories,
-                    ingredients,
-                    instructions,
-                    imageFile,
-                });
+                handleSubmit(false);
             }}
         >
             <Card className="p-6">
@@ -117,6 +148,8 @@ export function RecipeCreateForm() {
                     setTitle={setTitle}
                     minutes={minutes}
                     setMinutes={setMinutes}
+                    servingCount={servingCount}
+                    setServingCount={setServingCount}
                     comment={comment}
                     setComment={setComment}
                     imagePreview={imagePreview}
@@ -145,15 +178,26 @@ export function RecipeCreateForm() {
                     onRemoveInstruction={removeInstruction}
                 />
 
+                {error && (
+                    <p className="text-sm text-destructive text-center">{error}</p>
+                )}
+
                 <section className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-4 border-t border-border">
-                    <Button type="button" variant="outline" className="order-2 sm:order-1">
-                        下書き保存（未実装）
+                    <Button
+                        type="button"
+                        variant="outline"
+                        className="order-2 sm:order-1"
+                        disabled={isPending}
+                        onClick={() => handleSubmit(true)}
+                    >
+                        {isPending ? "保存中..." : "下書き保存"}
                     </Button>
                     <Button
                         type="submit"
                         className="order-1 sm:order-2 bg-emerald-600 hover:bg-emerald-700 focus-visible:ring-emerald-500"
+                        disabled={isPending}
                     >
-                        レシピを登録（未接続）
+                        {isPending ? "登録中..." : "レシピを登録"}
                     </Button>
                 </section>
                 </CardContent>

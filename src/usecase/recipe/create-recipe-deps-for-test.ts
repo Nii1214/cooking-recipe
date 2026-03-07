@@ -15,6 +15,7 @@ export function createRecipeDepsForTest(
     description: "",
     servingCount: 1,
     preparationTimeMinutes: 0,
+    isDraft: false,
     ingredients: [],
     instructions: [],
     categories: [],
@@ -27,6 +28,7 @@ export function createRecipeDepsForTest(
     createRecipe: vi.fn().mockResolvedValue(mockRecipe),
     saveIngredients: vi.fn().mockResolvedValue(undefined),
     saveInstructions: vi.fn().mockResolvedValue(undefined),
+    saveCategories: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
 }

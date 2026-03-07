@@ -11,6 +11,8 @@ type Props = {
     setTitle: (v: string) => void;
     minutes: number | "";
     setMinutes: (v: number | "") => void;
+    servingCount: number | "";
+    setServingCount: (v: number | "") => void;
     comment: string;
     setComment: (v: string) => void;
     imagePreview: string | null;
@@ -23,6 +25,8 @@ export function RecipeGeneralSection({
     setTitle,
     minutes,
     setMinutes,
+    servingCount,
+    setServingCount,
     comment,
     setComment,
     imagePreview,
@@ -68,17 +72,34 @@ export function RecipeGeneralSection({
                             </Label>
                         )}
                     </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="minutes">調理時間（分）</Label>
-                        <Input
-                            id="minutes"
-                            type="number"
-                            inputMode="numeric"
-                            value={minutes}
-                            onChange={(e) => setMinutes(e.target.value === "" ? "" : Number(e.target.value))}
-                            min={1}
-                            placeholder="例: 30"
-                        />
+                    <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-2">
+                            <Label htmlFor="minutes">調理時間（分）</Label>
+                            <Input
+                                id="minutes"
+                                type="number"
+                                inputMode="numeric"
+                                value={minutes}
+                                onChange={(e) => setMinutes(e.target.value === "" ? "" : Number(e.target.value))}
+                                min={1}
+                                placeholder="例: 30"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="serving-count">
+                                何人前 <span className="text-destructive">*</span>
+                            </Label>
+                            <Input
+                                id="serving-count"
+                                type="number"
+                                inputMode="numeric"
+                                value={servingCount}
+                                onChange={(e) => setServingCount(e.target.value === "" ? "" : Number(e.target.value))}
+                                min={1}
+                                required
+                                placeholder="例: 2"
+                            />
+                        </div>
                     </div>
                 </div>
                 <div className="space-y-2">

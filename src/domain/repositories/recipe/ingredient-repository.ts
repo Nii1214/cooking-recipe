@@ -1,8 +1,13 @@
 export type IngredientInput = {
-    id: string;
-    name: string;      // 例: 人参
-    quantity: string;  // 例: 1.5
-    unit: string;      // 例: 本、g、小さじ1
-    note?: string;     // 例: 乱切りにしておく
-    order: number;     // 並び順
+    /** 材料マスターへの参照。自由入力の場合は undefined */
+    ingredientId?: string;
+    /** ユーザーが入力した表示用の材料名 */
+    name: string;
+    /** 表示用の量。"適量" などの文字列も入る */
+    quantityDisplay: string;
+    /** 数値計算用の量。数値化できない場合は undefined */
+    quantityValue?: number;
+    unit: string;
+    note?: string;
+    order: number;
 }

@@ -36,7 +36,7 @@
 - **domain** … 最内層。型・エンティティ・リポジトリの**インターフェース（契約）**のみ。  
 - **usecase** … domain に依存。リポジトリは「インターフェース」にだけ依存し、**実装（infra）は import しない**。  
 - **infrastructure** … domain のリポジトリ契約を**実装**する。Supabase 等を呼ぶ。  
-- **app** … Server Actions やページ。usecase を呼び、必要なら **infra を組み立てて usecase に渡す（DI）**。  
+- **app** … Server Actions やページ。usecase を呼び、必要なら **infra を組み立てて usecase に deps として渡す**。  
 - **presentation** … UI コンポーネント。app の Action 等を呼ぶ。
 
 ---
@@ -114,7 +114,7 @@ flowchart TB
 ```
 
 - **domain** … 他層やフレームワークに依存しない（`domain/repositories` → `domain/models` のみ可）。  
-- **usecase** … domain と types/utils/constants に依存。**infrastructure は import しない**（契約だけに依存し、実装は app から注入）。  
+- **usecase** … domain と types/utils/constants に依存。**infrastructure は import しない**（契約だけに依存し、実装は app から deps として渡す）。  
 - **infrastructure** … domain と lib に依存。  
 - **app** … usecase / infrastructure / lib 等を組み合わせ、**「誰を誰に渡すか」を決める**層。
 
@@ -122,7 +122,7 @@ flowchart TB
 
 ## 3. 処理の流れ（何をどこで呼ぶか）
 
-### 3.1 認証フロー（サインアップ）— DI を使うパターン
+### 3.1 認証フロー（サインアップ）— app 層で impl を渡すパターン
 
 usecase はリポジトリの**インターフェース**だけに依存し、**実装は app 層で組み立てて渡す**。
 
@@ -131,9 +131,8 @@ sequenceDiagram
     participant User
     participant Page as app/(auth)/signup/page
     participant Form as presentation/signup-form
-    participant Action as app/signup.action
-    participant DI as lib/di-container
-    participant UseCase as usecase/signup.usecase
+    participant Action as app/(auth)/signup/signup.action
+    participant UseCase as usecase/auth/signup.usecase
     participant RepoInterface as domain/repositories
     participant RepoImpl as infrastructure/auth-repository-impl
     participant Lib as lib/supabase
@@ -143,15 +142,12 @@ sequenceDiagram
     User->>Form: 入力・送信
     Form->>Action: signupAction(formData)
 
-    Action->>DI: getSignupUseCase()
-    DI->>RepoImpl: new AuthRepositoryImpl()
-    DI->>UseCase: new SignupUseCase(authRepository)
-    DI-->>Action: useCase
-
+    Note over Action: AuthRepositoryImpl を生成して SignupUseCase に渡す
+    Action->>UseCase: new SignupUseCase(new AuthRepositoryImpl())
     Action->>UseCase: execute({ email, password })
     UseCase->>UseCase: バリデーション(utils/validation)
     UseCase->>RepoInterface: authRepository.signup(input)
-    Note over UseCase,RepoImpl: 実際は DI が渡した RepoImpl
+    Note over UseCase,RepoImpl: 実体は Action が deps として渡した RepoImpl
     RepoImpl->>Lib: supabase.auth.signUp(...)
     Lib-->>RepoImpl: 結果
     RepoImpl-->>UseCase: User
@@ -161,33 +157,46 @@ sequenceDiagram
     Action-->>Form: SignupResult
 ```
 
-- **app（Action）** … `DIContainer.getSignupUseCase()` で usecase を取得。中で `AuthRepositoryImpl` が生成され、`SignupUseCase` に渡っている。  
+- **app（Action）** … Action 内で `AuthRepositoryImpl` を生成し、`SignupUseCase` のコンストラクタに渡す。usecase は「契約」だけを知っている。  
 - **usecase** … `AuthRepository` の**型（契約）**だけを知っており、`signup(input)` を呼ぶ。infra を import していない。  
 - **infrastructure** … `AuthRepository` を実装し、`lib/supabase` を呼ぶ。
 
-### 3.2 レシピ作成フロー — 現状の呼び出し関係
+### 3.2 レシピ作成フロー — deps パターンの呼び出し関係
 
-現在の `create-recipe-usecase.ts` は **usecase が infrastructure を直接 import している**。  
-クリーンアーキテクチャの依存ルールに厳密に従う場合は、認証と同様に「app 層で infra を組み立てて usecase に渡す」形にするとよい。
+`create-recipe-usecase.ts` は**関数の引数で deps を受け取る**形で実装されており、usecase は infrastructure を直接 import しない。  
+app 層が各リポジトリの実装を deps オブジェクトにまとめて usecase に渡す。
 
 ```mermaid
 sequenceDiagram
-    participant Caller as app または 呼び出し元
-    participant UseCase as usecase/create-recipe-usecase
-    participant DomainTypes as domain/models, domain/repositories
-    participant Infra as infrastructure/repositories/recipe/*
+    participant Action as app/recipe/new/action
+    participant UseCase as usecase/recipe/create-recipe-usecase
+    participant RepoInterface as domain/repositories（契約）
+    participant RecipeImpl as infrastructure/recipe-repository-impl
+    participant IngredientImpl as infrastructure/ingredient-repository-impl
+    participant InstructionImpl as infrastructure/instruction-repository-impl
+    participant DB as lib/supabase
 
-    Caller->>UseCase: createRecipeUsecase(input)
-    UseCase->>Infra: createRecipe(input)
-    Infra->>DomainTypes: RecipeInput 等の型を参照
-    Infra-->>UseCase: Recipe
-    UseCase->>Infra: saveIngredients(recipe.id, input.ingredients)
-    UseCase->>Infra: saveInstructions(recipe.id, input.instructions)
-    UseCase-->>Caller: Recipe
+    Note over Action: deps で各 impl を組み立て usecase に渡す
+    Action->>UseCase: createRecipeUsecase(input, deps)
+    UseCase->>RepoInterface: deps.createRecipe(input)
+    Note over UseCase,RecipeImpl: 実体は Action が deps として渡した impl
+    RecipeImpl->>DB: recipes INSERT
+    DB-->>RecipeImpl: recipe
+    RecipeImpl-->>UseCase: Recipe
+    UseCase->>RepoInterface: deps.saveIngredients(recipe.id, input.ingredients)
+    IngredientImpl->>DB: ingredients INSERT
+    DB-->>IngredientImpl: ok
+    IngredientImpl-->>UseCase: void
+    UseCase->>RepoInterface: deps.saveInstructions(recipe.id, input.instructions)
+    InstructionImpl->>DB: instructions INSERT
+    DB-->>InstructionImpl: ok
+    InstructionImpl-->>UseCase: void
+    UseCase-->>Action: Recipe
 ```
 
-- **現状** … usecase → infrastructure の直接依存がある（依存の向きが逆）。  
-- **推奨** … 認証と同様に、usecase は「レシピ用リポジトリのインターフェース」だけに依存し、`createRecipe` / `saveIngredients` / `saveInstructions` の実装は app 層で渡す（関数の引数で deps を受け取る、または DI コンテナで渡す）。
+- **app（Action）** … 各リポジトリの実装（`createRecipe`, `saveIngredients`, `saveInstructions`）を deps にまとめて `createRecipeUsecase` に渡す。  
+- **usecase** … `deps.createRecipe` / `deps.saveIngredients` / `deps.saveInstructions` という**関数の型（契約）**だけを知っており、infra を import しない。  
+- **infrastructure** … 各リポジトリ実装関数が INSERT を実行。これらは action が deps として渡している。
 
 ### 3.3 一覧：どこから何を呼ぶか
 
@@ -212,7 +221,7 @@ CRUD の呼び出しは **参照（Read）** と **作成・更新・削除（CU
 **図について（依存関係の補足）**  
 以下のシーケンス図では、usecase から「Repo」を呼ぶように描いているが、**usecase が依存しているのはリポジトリのインターフェース（契約）だけ**である。**impl（infrastructure の実装）は action が組み立てて usecase に渡す**ため、usecase は impl を import しない。図中で「実体は impl」と書いているのは「実行時に動くコードは infrastructure の実装」という意味で、**依存の向き**は usecase → domain の契約のみである。
 
-以下はすべて **action → usecase → リポジトリ（インターフェース経由。実体は action が注入した impl）** の形で、action は usecase だけを呼び出す前提で描いている。
+以下はすべて **action → usecase → リポジトリ（インターフェース経由。実体は action が deps として渡した impl）** の形で、action は usecase だけを呼び出す前提で描いている。
 
 ### 4.1 参照（Read）— レシピ 1 件取得
 
@@ -223,11 +232,11 @@ sequenceDiagram
     participant Form as presentation
     participant Action as app/recipe/[id]/action
     participant UseCase as usecase/get-recipe-usecase
-    participant Repo as リポジトリ（契約）<br/>実体は action が注入した impl
+    participant Repo as リポジトリ（契約）<br/>実体は action が deps として渡した impl
     participant DB as lib/supabase
 
     Form->>Action: getRecipeAction(recipeId)
-    Note over Action: usecase に repo を注入
+    Note over Action: usecase に deps を渡す
     Action->>UseCase: getRecipeById(recipeId)
     UseCase->>Repo: getRecipeById(recipeId)
     Note over UseCase,Repo: usecase は契約にのみ依存
@@ -238,9 +247,9 @@ sequenceDiagram
     Action-->>Form: Recipe or error
 ```
 
-- **action** … usecase を呼ぶ前に、リポジトリの**実装（impl）**を組み立てて usecase に渡す（DI）。usecase は「契約」だけを知っている。
+- **action** … usecase を呼ぶ前に、リポジトリの**実装（impl）**を deps として組み立てて usecase に渡す。usecase は「契約」だけを知っている。
 - **usecase** … `getRecipeById(recipeId)` を**リポジトリのインターフェース**に委譲する。impl は import しない。
-- **infra** … リポジトリの**実装**が `getRecipeById` で Supabase から SELECT する。action がこの実装を usecase に注入している。
+- **infra** … リポジトリの**実装**が `getRecipeById` で Supabase から SELECT する。action がこの実装を deps として usecase に渡している。
 
 一覧取得（`findRecipesByAuthorId` など）も同じパターンで、usecase がリポジトリの find 系を 1 回呼んで返す。
 
@@ -285,7 +294,7 @@ sequenceDiagram
 
 - **action** … usecase に「createRecipe 用の deps」（各リポジトリの**実装**）を渡してから `createRecipe(input)` を呼ぶ。usecase は契約だけに依存する。
 - **usecase** … 1) createRecipe、2) saveIngredients、3) saveInstructions の順で**リポジトリのインターフェース**を呼ぶ。impl は import しない。
-- **infra** … 各リポジトリの実装が INSERT を実行。これらは action が usecase に注入している。
+- **infra** … 各リポジトリの実装が INSERT を実行。これらは action が deps として usecase に渡している。
 
 ---
 
@@ -298,11 +307,11 @@ sequenceDiagram
     participant Form as presentation
     participant Action as app/recipe/[id]/edit/action
     participant UseCase as usecase/update-recipe-usecase
-    participant Repo as リポジトリ（契約）<br/>実体は action が注入した impl
+    participant Repo as リポジトリ（契約）<br/>実体は action が deps として渡した impl
     participant DB as lib/supabase
 
     Form->>Action: updateRecipeAction(recipeId, formData)
-    Note over Action: usecase に repo を注入
+    Note over Action: usecase に deps を渡す
     Action->>UseCase: updateRecipe(recipeId, input)
     UseCase->>UseCase: バリデーション等
     UseCase->>Repo: updateRecipe(recipeId, input)
@@ -314,7 +323,7 @@ sequenceDiagram
     Action-->>Form: Recipe or error
 ```
 
-- **action** … usecase にリポジトリの**実装**を注入してから `updateRecipe` を呼ぶ。
+- **action** … usecase に deps としてリポジトリの**実装**を渡してから `updateRecipe` を呼ぶ。
 - **usecase** … 必要ならバリデーションをしたあと、**リポジトリのインターフェース**の `updateRecipe` に委譲。impl には依存しない。
 - **infra** … `updateRecipe` の実装で UPDATE を実行。
 
@@ -329,11 +338,11 @@ sequenceDiagram
     participant Form as presentation
     participant Action as app/recipe/[id]/action
     participant UseCase as usecase/delete-recipe-usecase
-    participant Repo as リポジトリ（契約）<br/>実体は action が注入した impl
+    participant Repo as リポジトリ（契約）<br/>実体は action が deps として渡した impl
     participant DB as lib/supabase
 
     Form->>Action: deleteRecipeAction(recipeId)
-    Note over Action: usecase に repo を注入
+    Note over Action: usecase に deps を渡す
     Action->>UseCase: deleteRecipe(recipeId)
     UseCase->>UseCase: 権限チェック等
     UseCase->>Repo: deleteRecipe(recipeId)
@@ -345,7 +354,7 @@ sequenceDiagram
     Action-->>Form: redirect or error
 ```
 
-- **action** … usecase にリポジトリの**実装**を注入してから `deleteRecipe` を呼ぶ。
+- **action** … usecase に deps としてリポジトリの**実装**を渡してから `deleteRecipe` を呼ぶ。
 - **usecase** … 権限や削除可能条件を確認したあと、**リポジトリのインターフェース**の `deleteRecipe` に委譲。impl には依存しない。
 - **infra** … `deleteRecipe` の実装で DELETE を実行（関連テーブルは CASCADE または usecase で明示的に delete を呼ぶ）。
 
@@ -364,10 +373,10 @@ sequenceDiagram
 
 ## 5. まとめ
 
-- **依存の向き** … 内側（domain）は外側に依存しない。usecase は domain と「契約」にだけ依存し、**infrastructure は import しない**（実装は app 層で組み立てて渡す）。  
+- **依存の向き** … 内側（domain）は外側に依存しない。usecase は domain と「契約」にだけ依存し、**infrastructure は import しない**（実装は app 層で deps として渡す）。  
 - **何をどこで呼ぶか** … 上記の図と表を基準にすると、「この処理はどの層に書くか」「この層からあの層を import してよいか」の判断がしやすい。  
-- **認証** … すでに DI と「usecase → インターフェースのみ」ができている。  
-- **レシピ作成** … 現状は usecase が infra を直接 import しているため、クリーンアーキテクチャに揃えるなら、app 層で infra を渡す形への変更を検討するとよい。
+- **認証** … app 層で impl を生成してコンストラクタに渡し、「usecase → インターフェースのみ」の依存を守る。  
+- **レシピ作成** … usecase が deps（関数の型）を引数で受け取り、app 層で各 impl を deps として渡す形で実装済み。
 
 各ディレクトリの詳細なルールは、次の README を参照すること。
 

@@ -4,7 +4,7 @@
 このディレクトリは以下の役割がある。
 - **リポジトリの実装** … `src/domain/repositories/` で定義したインターフェース（契約）を、実際の DB アクセス・外部 API 呼び出しで実装する
 - **永続化の詳細のカプセル化** … Supabase のテーブル名・カラム名・snake_case とドメインモデルの camelCase の変換など、永続化にまつわる詳細をここに閉じる
-- **依存性の逆転の受け手** … ユースケース層はドメインのインターフェースに依存し、この実装を注入することで、具体的な DB や API に依存しない構成にする
+- **依存性の逆転の受け手** … ユースケース層はドメインのインターフェースに依存し、この実装を app 層から deps として渡すことで、具体的な DB や API に依存しない構成にする
 
 ## 配置方針
 - このディレクトリには **リポジトリの実装のみ** を置く。契約（インターフェース・入出力型）は `src/domain/repositories/` に定義する
@@ -14,7 +14,7 @@
 ## 命名規則
 
 ### ファイル名・実装名
-- ファイル名: `{関心事}-repository-impl.ts` または `{関心事}-repository-impl.ts`（例: `recipe-repository-impl.ts`, `auth-repository-impl.ts`）
+- ファイル名: `{関心事}-repository-impl.ts`（例: `recipe-repository-impl.ts`, `auth-repository-impl.ts`）
 - クラスで実装する場合: `{関心事}RepositoryImpl`（例: `AuthRepositoryImpl`）
 - 関数で実装する場合: 下記のメソッド命名規則に合わせた関数名（例: `createRecipe`, `saveIngredients`）
 

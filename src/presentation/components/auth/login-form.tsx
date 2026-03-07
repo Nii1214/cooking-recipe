@@ -1,5 +1,5 @@
 'use client';
-import { loginAction } from "@/app/(auth)/login/actions";
+import { loginAction } from "@/app/(auth)/login/login.action";
 import { LoginResult } from "@/types/auth";
 import { useActionState, useState } from "react";
 import { Eye, EyeOff } from 'lucide-react';

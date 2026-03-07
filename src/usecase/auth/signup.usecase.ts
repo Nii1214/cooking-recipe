@@ -1,6 +1,7 @@
 import { AuthRepository, SignupInput } from "@/domain/repositories/auth-repository";
 import { SignupResult } from "@/types/auth";
 import { isValidEmail, isValidPasswordLength } from "@/utils/validation";
+import { ERROR_MESSAGES } from "@/constants/error-messages";
 
 /**
  * ユーザー登録のビジネスロジックを実行するUseCase
@@ -11,11 +12,7 @@ import { isValidEmail, isValidPasswordLength } from "@/utils/validation";
  * - Resultパターンで成功/失敗を返却
  */
 export class SignupUseCase {
-    /**
-     * @param authRepository 
-     */
     constructor(private authRepository: AuthRepository){}
-
     /**
      * サインアップ処理を実行
      * 
@@ -27,14 +24,15 @@ export class SignupUseCase {
         if(!isValidEmail(input.email)) {
             return {
                 success: false,
-                error: 'メールアドレスの形式が正しくありません'
+                error: ERROR_MESSAGES.EMAIL_INVALID_FORMAT
             };
         }
+        
         // パスワード文字数チェック
         if(!isValidPasswordLength(input.password,8)) {
             return {
                 success: false,
-                error: 'パスワードは8文字以上で入力してください'
+                error: ERROR_MESSAGES.PASSWORD_MIN_LENGTH(8)
             };
         }
 

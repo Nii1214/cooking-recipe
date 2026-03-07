@@ -51,6 +51,11 @@
 `accessible_recipe_ids` ビューを通じて `recipes` の RLS を再利用する（レビュー指摘 I-2 対応）。
 これにより各ポリシーに `is_same_family()` を直接記述する必要がなくなり、シンプルになる。
 
+> **重要：`security_invoker = true` について**
+> このビューは `WITH (security_invoker = true)` で定義されている。
+> デフォルト（`SECURITY DEFINER`）のままだとビューがスーパーユーザーの権限で実行され、
+> `recipes` テーブルの RLS が**完全にスキップ**されてしまうため、必須の設定。
+
 | 操作 | 実装 | 説明 |
 |---|---|---|
 | SELECT | `recipe_id in (select id from accessible_recipe_ids)` | 自分のレシピ（下書き含む）+ 家族の公開済みレシピの材料を参照できる |

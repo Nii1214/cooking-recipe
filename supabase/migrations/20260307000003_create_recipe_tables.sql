@@ -138,11 +138,14 @@ create policy "family members can delete published recipes"
 
 -- =============================================================================
 -- accessible_recipe_ids ビュー
--- recipes の RLS を子テーブルから再利用するためのビュー
--- このビューを通じた SELECT には recipes の RLS が自動適用される
+-- recipes の RLS を子テーブルから再利用するためのビュー。
+-- security_invoker = true により、クエリ実行ユーザーの権限で動作し
+-- recipes テーブルの RLS が正しく適用される。
 -- =============================================================================
 
-create or replace view accessible_recipe_ids as
+create or replace view accessible_recipe_ids
+  with (security_invoker = true)
+as
   select id from recipes;
 
 -- =============================================================================
@@ -267,11 +270,15 @@ create policy "users can delete accessible recipe instructions"
 
 -- =============================================================================
 -- recipe_summaries ビュー
--- レシピ一覧画面向けの集約ビュー。recipes の RLS が自動適用される
+-- レシピ一覧画面向けの集約ビュー。
+-- security_invoker = true により、クエリ実行ユーザーの権限で動作し
+-- recipes テーブルの RLS が正しく適用される。
 -- group by r.id: r.id が PK のため他カラムの関数従属性が保証される（PostgreSQL 有効）
 -- =============================================================================
 
-create or replace view recipe_summaries as
+create or replace view recipe_summaries
+  with (security_invoker = true)
+as
   select
     r.id,
     r.title,

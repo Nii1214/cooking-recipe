@@ -24,6 +24,9 @@ docs/tables/
 ├── family/                              ← 家族ドメイン
 │   ├── families.md                      ← 家族グループ
 │   └── family_members.md               ← ユーザー×家族グループ（中間テーブル）
+├── view/                                ← ビュー定義
+│   ├── accessible_recipe_ids.md         ← 子テーブルの RLS 再利用ビュー
+│   └── recipe_summaries.md             ← レシピ一覧用の集約ビュー（N+1 対策）
 └── auth/                                ← 認証ドメイン（追加予定）
     └── profiles.md
 ```

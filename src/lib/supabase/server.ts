@@ -32,3 +32,21 @@ export async function createClient(){
         },
     );
 }
+
+/**
+ * 認証済みであることを保証するクライアント生成関数
+ * セッションがない場合は一律で UNAUTHORIZED エラーを投げる
+ */
+export async function createAuthedClient() {
+    const supabase = await createClient();
+    
+    // getUser() はセッションの妥当性をサーバー側で再確認するため、getSession() より安全です
+    const { data: { user }, error } = await supabase.auth.getUser();
+
+    if (error || !user) {
+        throw new Error("UNAUTHORIZED");
+    }
+
+    // クライアントと、すでに取得済みのユーザー情報をセットで返却
+    return { supabase, user };
+}

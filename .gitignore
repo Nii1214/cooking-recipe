@@ -40,4 +40,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .cursor/*
-docs/*
+docs/QA/*
+docs/reviews/*
+docs/recipe_create/*
+docs/top/*

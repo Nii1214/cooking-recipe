@@ -46,8 +46,9 @@
 - `author_id` — FOREIGN KEY → `auth.users(id)` `ON DELETE CASCADE`
 - `serving_count` — CHECK: `serving_count > 0`
 - `preparation_time_minutes` — CHECK: `preparation_time_minutes > 0`
-- インデックス: `author_id`（ユーザーのレシピ一覧取得で使用）
-- インデックス: `is_draft`（下書き一覧・公開済み一覧の絞り込みで使用）
+- インデックス: `(author_id, is_draft)` 複合インデックス
+  - `author_id` 単独での検索にも有効（先頭カラムのため）
+  - 「自分のレシピ一覧」「自分の下書き一覧」など `WHERE author_id = ? AND is_draft = ?` のクエリに最適
 
 ## RLS ポリシー
 

@@ -17,8 +17,9 @@ docs/tables/
 ├── recipe/                              ← レシピドメイン
 │   ├── recipes.md                       ← レシピ基本情報（is_draft による一時保存含む）
 │   ├── categories.md                    ← カテゴリマスター
+│   ├── ingredients.md                   ← 材料マスター（正規化・将来の材料検索用）
 │   ├── recipe_categories.md             ← レシピ×カテゴリ（中間テーブル）
-│   ├── recipe_ingredients.md            ← 材料
+│   ├── recipe_ingredients.md            ← 材料（ingredient_id で材料マスターと紐付け）
 │   └── recipe_instructions.md          ← 調理手順
 ├── family/                              ← 家族ドメイン
 │   ├── families.md                      ← 家族グループ

@@ -49,7 +49,7 @@ export async function createRecipeAction(
       title: formData.title,
       description: formData.description,
       servingCount: formData.servingCount,
-      preparationTimeMinutes: formData.preparationTimeMinutes,
+      preparationTimeMinutes: formData.preparationTimeMinutes || 1,
       isDraft: formData.isDraft,
       categories: formData.categoryIds.map((id) => ({ id, name: "", slug: "" })),
       ingredients: formData.ingredients.map((ing, idx) => ({

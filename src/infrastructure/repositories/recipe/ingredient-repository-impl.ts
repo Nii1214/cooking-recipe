@@ -15,7 +15,7 @@ export const saveIngredients = async (
         quantity_value: item.quantityValue ?? null,
         unit: item.unit,
         note: item.note ?? null,
-        order_position: item.order,
+        order_position: item.order + 1,
     }));
 
     const { error } = await supabase

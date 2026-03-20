@@ -8,7 +8,7 @@ export interface RecipeSummary {
   id: string;
   title: string;
   description: string;
-  thumbnailUrl?: string;
+  thumbnailPath?: string;
   servingCount: number;
   preparationTimeMinutes: number;
   isDraft: boolean;

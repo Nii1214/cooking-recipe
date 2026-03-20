@@ -6,6 +6,7 @@ import {
   TopHero,
   QuickAccessSection,
 } from "@/presentation/components/recipe/TopHero";
+import { getPresignedImageUrl } from "@/lib/get-presigned-image-url";
 
 export default async function TopPage() {
   try {
@@ -15,6 +16,15 @@ export default async function TopPage() {
     };
 
     const recipes = await getRecipeSummariesUsecase(deps);
+
+    const recipesWithUrls = await Promise.all(
+      recipes.map(async (recipe) => ({
+        ...recipe,
+        thumbnailUrl: recipe.thumbnailPath
+          ? await getPresignedImageUrl(recipe.thumbnailPath)
+          : undefined,
+      }))
+    );
 
     return (
       <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
@@ -33,7 +43,7 @@ export default async function TopPage() {
           <p className="text-sm text-gray-500 mb-6">
             家族が登録した公開済みのレシピ一覧です
           </p>
-          <RecipeListPage recipes={recipes} />
+          <RecipeListPage recipes={recipesWithUrls} />
         </div>
       </div>
     );

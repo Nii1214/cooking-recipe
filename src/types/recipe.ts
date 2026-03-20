@@ -1,9 +1,11 @@
 import type { RecipeSummary } from "@/domain/models/recipe/recipe-summary";
 import type { Recipe } from "@/domain/models/recipe/recipe";
 
-/** レシピサマリー + お気に入りフラグ（トップ画面で使用） */
+/** レシピサマリー + お気に入りフラグ + プレサインドURL（トップ画面で使用） */
 export type RecipeSummaryWithFavorite = RecipeSummary & {
   isFavorited: boolean;
+  /** サーバーで生成したプレサインド GET URL（有効期限付き）。thumbnailPath がない場合は undefined */
+  thumbnailUrl?: string;
 };
 
 /**

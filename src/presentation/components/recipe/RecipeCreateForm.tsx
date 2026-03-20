@@ -10,6 +10,8 @@ import { RecipeGeneralSection } from "./RecipeGeneralSection";
 import { RecipeIngredientsSection } from "./RecipeIngredientsSection";
 import { RecipeInstructionsSection } from "./RecipeInstructionsSection";
 import { createRecipeAction } from "@/app/recipe/new/action";
+import { uploadRecipeImage } from "@/infrastructure/storage/upload-recipe-image";
+import { getUploadUrlAction } from "@/app/recipe/new/get-upload-url-action";
 
 export function RecipeCreateForm() {
     const router = useRouter();
@@ -102,9 +104,10 @@ export function RecipeCreateForm() {
         );
     };
 
-    const buildFormData = (isDraft: boolean) => ({
+    const buildFormData = (isDraft: boolean, thumbnailPath?: string) => ({
         title,
         description: comment,
+        thumbnailPath,
         servingCount: Number(servingCount) || 1,
         preparationTimeMinutes: Number(minutes) || 0,
         isDraft,
@@ -125,7 +128,24 @@ export function RecipeCreateForm() {
     const handleSubmit = (isDraft: boolean) => {
         setError(null);
         startTransition(async () => {
-            const result = await createRecipeAction(buildFormData(isDraft));
+            let thumbnailPath: string | undefined;
+
+            if (imageFile) {
+                try {
+                    // サーバーからプレサインド URL とパスを取得
+                    const uploadUrlResult = await getUploadUrlAction(imageFile.name, imageFile.type);
+                    if (!uploadUrlResult.success) throw new Error(uploadUrlResult.error);
+
+                    // ブラウザから S3 に直接アップロード
+                    await uploadRecipeImage(imageFile, uploadUrlResult.presignedUrl);
+                    thumbnailPath = uploadUrlResult.path;
+                } catch (e) {
+                    setError(e instanceof Error ? e.message : "画像のアップロードに失敗しました");
+                    return;
+                }
+            }
+
+            const result = await createRecipeAction(buildFormData(isDraft, thumbnailPath));
             if (result.success) {
                 router.push(`/recipe/${result.recipe.id}`);
             } else {

@@ -4,9 +4,10 @@ import { Badge } from "@/components/ui/badge";
 
 type Props = {
   recipe: Recipe;
+  thumbnailUrl?: string;
 };
 
-export function RecipeDetailView({ recipe }: Props) {
+export function RecipeDetailView({ recipe, thumbnailUrl }: Props) {
   return (
     <div className="space-y-6">
       <div className="space-y-3">
@@ -26,10 +27,10 @@ export function RecipeDetailView({ recipe }: Props) {
         )}
       </div>
 
-      {recipe.thumbnailUrl && (
+      {thumbnailUrl && (
         <div className="aspect-video w-full overflow-hidden rounded-lg">
           <img
-            src={recipe.thumbnailUrl}
+            src={thumbnailUrl}
             alt={recipe.title}
             className="w-full h-full object-cover"
           />

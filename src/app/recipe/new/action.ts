@@ -15,6 +15,8 @@ export type CreateRecipeFormData = {
   servingCount: number;
   preparationTimeMinutes: number;
   isDraft: boolean;
+  /** S3 にアップロード済みの画像パス（例: recipes/user-id/uuid.jpg）。未選択の場合は undefined */
+  thumbnailPath?: string;
   categoryIds: string[];
   ingredients: Array<{
     name: string;
@@ -48,6 +50,7 @@ export async function createRecipeAction(
       updatedAt: now,
       title: formData.title,
       description: formData.description,
+      thumbnailPath: formData.thumbnailPath,
       servingCount: formData.servingCount,
       preparationTimeMinutes: formData.preparationTimeMinutes || 1,
       isDraft: formData.isDraft,

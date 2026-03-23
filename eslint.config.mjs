@@ -71,6 +71,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // ドキュメント用サンプルコード（lintの対象外）
+    "docs/**",
   ]),
   // ---------- domain: 最内層。他層・shared に依存しない（error で厳格化）
   {

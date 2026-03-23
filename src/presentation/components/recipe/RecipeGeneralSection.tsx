@@ -1,5 +1,6 @@
 "use client";
 
+import NextImage from "next/image";
 import { Image as ImageIcon, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,8 +53,8 @@ export function RecipeGeneralSection({
                     <div className="space-y-2">
                         <Label>料理の画像</Label>
                         {imagePreview ? (
-                            <div className="relative">
-                                <img src={imagePreview} alt="Preview" className="w-full h-40 object-cover rounded-md" />
+                            <div className="relative h-40 w-full">
+                                <NextImage src={imagePreview} alt="Preview" fill unoptimized className="object-cover rounded-md" />
                                 <Button
                                     type="button"
                                     variant="secondary"

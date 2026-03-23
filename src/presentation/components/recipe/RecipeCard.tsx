@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import type { RecipeSummaryWithFavorite } from "@/types/recipe";
 import { Badge } from "@/components/ui/badge";
 import { FavoriteButton } from "./FavoriteButton";
@@ -28,10 +29,12 @@ export function RecipeCard({ recipe, onFavoriteToggled }: Props) {
         {/* サムネイル */}
         <div className="relative aspect-[4/3] w-full overflow-hidden">
           {recipe.thumbnailUrl ? (
-            <img
+            <Image
               src={recipe.thumbnailUrl}
               alt={recipe.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              fill
+              unoptimized
+              className="object-cover group-hover:scale-105 transition-transform duration-500"
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-emerald-50 via-amber-50 to-orange-50 flex items-center justify-center">

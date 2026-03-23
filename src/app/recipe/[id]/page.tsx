@@ -11,23 +11,22 @@ type Props = {
 export default async function RecipeDetailPage({ params }: Props) {
   const { id } = await params;
 
+  let recipe: Awaited<ReturnType<typeof getRecipeDetailUsecase>>;
   try {
-    const recipe = await getRecipeDetailUsecase(id, {
-      getRecipeById,
-    });
-
-    const thumbnailUrl = recipe.thumbnailPath
-      ? await getPresignedImageUrl(recipe.thumbnailPath)
-      : undefined;
-
-    return (
-      <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
-        <div className="w-full max-w-3xl mx-auto px-4 py-6">
-          <RecipeDetailView recipe={recipe} thumbnailUrl={thumbnailUrl} />
-        </div>
-      </div>
-    );
+    recipe = await getRecipeDetailUsecase(id, { getRecipeById });
   } catch {
     notFound();
   }
+
+  const thumbnailUrl = recipe.thumbnailPath
+    ? await getPresignedImageUrl(recipe.thumbnailPath)
+    : undefined;
+
+  return (
+    <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
+      <div className="w-full max-w-3xl mx-auto px-4 py-6">
+        <RecipeDetailView recipe={recipe} thumbnailUrl={thumbnailUrl} />
+      </div>
+    </div>
+  );
 }

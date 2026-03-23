@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // ドキュメント用サンプルコード（lintの対象外）
+    "docs/**",
   ]),
 ]);
 

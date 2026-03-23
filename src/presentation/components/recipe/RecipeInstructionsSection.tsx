@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import NextImage from "next/image";
 import { GripVertical, Image as ImageIcon, Plus, X } from "lucide-react";
 import type { InstructionUI } from "./recipe-create-types";
 import { Button } from "@/components/ui/button";
@@ -112,10 +113,12 @@ export function RecipeInstructionsSection({
                                                     key={imgIndex}
                                                     className="relative w-full aspect-video max-h-64 rounded-lg border border-border overflow-hidden bg-muted"
                                                 >
-                                                    <img
+                                                    <NextImage
                                                         src={img.preview}
                                                         alt={`手順${inst.stepNumber}の画像${imgIndex + 1}`}
-                                                        className="w-full h-full object-contain"
+                                                        fill
+                                                        unoptimized
+                                                        className="object-contain"
                                                     />
                                                     <Button
                                                         type="button"

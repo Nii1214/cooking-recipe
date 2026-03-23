@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { Recipe } from "@/types/recipe";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -28,11 +29,13 @@ export function RecipeDetailView({ recipe, thumbnailUrl }: Props) {
       </div>
 
       {thumbnailUrl && (
-        <div className="aspect-video w-full overflow-hidden rounded-lg">
-          <img
+        <div className="relative aspect-video w-full overflow-hidden rounded-lg">
+          <Image
             src={thumbnailUrl}
             alt={recipe.title}
-            className="w-full h-full object-cover"
+            fill
+            unoptimized
+            className="object-cover"
           />
         </div>
       )}
@@ -81,11 +84,15 @@ export function RecipeDetailView({ recipe, thumbnailUrl }: Props) {
                   <div className="flex-1 pt-1">
                     <p className="text-gray-700">{inst.description}</p>
                     {inst.imageUrl && (
-                      <img
-                        src={inst.imageUrl}
-                        alt={`手順 ${inst.stepNumber}`}
-                        className="mt-2 rounded-lg max-w-sm"
-                      />
+                      <div className="relative mt-2 max-w-sm aspect-video">
+                        <Image
+                          src={inst.imageUrl}
+                          alt={`手順 ${inst.stepNumber}`}
+                          fill
+                          unoptimized
+                          className="rounded-lg object-cover"
+                        />
+                      </div>
                     )}
                   </div>
                 </li>

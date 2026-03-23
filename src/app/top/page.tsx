@@ -8,45 +8,29 @@ import {
 } from "@/presentation/components/recipe/TopHero";
 import { getPresignedImageUrl } from "@/lib/get-presigned-image-url";
 
+async function fetchRecipesWithUrls() {
+  const deps = {
+    getRecipeSummaries,
+    getFavoriteRecipeIds,
+  };
+
+  const recipes = await getRecipeSummariesUsecase(deps);
+
+  return Promise.all(
+    recipes.map(async (recipe) => ({
+      ...recipe,
+      thumbnailUrl: recipe.thumbnailPath
+        ? await getPresignedImageUrl(recipe.thumbnailPath)
+        : undefined,
+    }))
+  );
+}
+
 export default async function TopPage() {
+  let recipesWithUrls: Awaited<ReturnType<typeof fetchRecipesWithUrls>>;
+
   try {
-    const deps = {
-      getRecipeSummaries,
-      getFavoriteRecipeIds,
-    };
-
-    const recipes = await getRecipeSummariesUsecase(deps);
-
-    const recipesWithUrls = await Promise.all(
-      recipes.map(async (recipe) => ({
-        ...recipe,
-        thumbnailUrl: recipe.thumbnailPath
-          ? await getPresignedImageUrl(recipe.thumbnailPath)
-          : undefined,
-      }))
-    );
-
-    return (
-      <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
-        <TopHero recipeCount={recipes.length} />
-        <QuickAccessSection />
-
-        <div
-          id="recipe-list"
-          className="w-full max-w-5xl mx-auto px-4 pt-10 pb-16"
-        >
-          <div className="flex items-center gap-3 mb-2">
-            <h2 className="text-xl font-bold text-gray-900 font-serif">
-              みんなのレシピ
-            </h2>
-          </div>
-          <p className="text-sm text-gray-500 mb-6">
-            家族が登録した公開済みのレシピ一覧です
-          </p>
-          <RecipeListPage recipes={recipesWithUrls} />
-        </div>
-      </div>
-    );
+    recipesWithUrls = await fetchRecipesWithUrls();
   } catch {
     return (
       <div className="min-h-[calc(100vh-4rem)] bg-gray-50 flex items-center justify-center">
@@ -60,4 +44,26 @@ export default async function TopPage() {
       </div>
     );
   }
+
+  return (
+    <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
+      <TopHero recipeCount={recipesWithUrls.length} />
+      <QuickAccessSection />
+
+      <div
+        id="recipe-list"
+        className="w-full max-w-5xl mx-auto px-4 pt-10 pb-16"
+      >
+        <div className="flex items-center gap-3 mb-2">
+          <h2 className="text-xl font-bold text-gray-900 font-serif">
+            みんなのレシピ
+          </h2>
+        </div>
+        <p className="text-sm text-gray-500 mb-6">
+          家族が登録した公開済みのレシピ一覧です
+        </p>
+        <RecipeListPage recipes={recipesWithUrls} />
+      </div>
+    </div>
+  );
 }

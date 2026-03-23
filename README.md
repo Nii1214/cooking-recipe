@@ -93,14 +93,14 @@ Family Recipe Archive は、
 
 ### Tech Stack
 
-| カテゴリ | 技術 | 選定理由 |
-|--------|-----|---------|
-| フレームワーク | Next.js 16（App Router） | Server Actions による型安全なサーバー処理 |
-| UI | React 19 + Tailwind CSS v4 + shadcn/ui | 高速な UI 開発と一貫したデザイン |
-| 言語 | TypeScript | 型安全性、エディタ補完によるDX向上 |
-| BaaS | Supabase（PostgreSQL + Auth + Storage） | RLS によるマルチテナント対応、コスト効率 |
-| ホスティング | Vercel | Next.js との親和性、エッジデプロイ |
-| テスト | Vitest | 高速なユニットテスト、TypeScript ネイティブ |
+| カテゴリ       | 技術                                    | 選定理由                                    |
+| -------------- | --------------------------------------- | ------------------------------------------- |
+| フレームワーク | Next.js 16（App Router）                | Server Actions による型安全なサーバー処理   |
+| UI             | React 19 + Tailwind CSS v4 + shadcn/ui  | 高速な UI 開発と一貫したデザイン            |
+| 言語           | TypeScript                              | 型安全性、エディタ補完によるDX向上          |
+| BaaS           | Supabase（PostgreSQL + Auth + Storage） | RLS によるマルチテナント対応、コスト効率    |
+| ホスティング   | Vercel                                  | Next.js との親和性、エッジデプロイ          |
+| テスト         | Vitest                                  | 高速なユニットテスト、TypeScript ネイティブ |
 
 各技術の選定詳細は [`docs/adr/`](./docs/adr/) を参照してください。
 
@@ -265,3 +265,10 @@ npm run test:run
 家族の味は、消耗品ではなく「記憶資産」である。
 
 それを守るための設計を行っています。
+
+## Security
+
+- AWS IAMユーザーで運用
+- ルートユーザーは日常利用しない
+- IAM / Root ユーザーにMFAを設定
+- シークレットは環境変数で管理

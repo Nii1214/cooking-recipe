@@ -7,7 +7,7 @@ export type RecipeInput = {
     id: string;
     title: string;
     description: string;
-    thumbnailUrl?: string;
+    thumbnailPath?: string;
     servingCount: number;
     preparationTimeMinutes: number;
     /** true: 一時保存中、false: 公開済み */

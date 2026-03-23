@@ -44,3 +44,5 @@ docs/QA/*
 docs/reviews/*
 docs/recipe_create/*
 docs/top/*
+
+.obsidian/workspace.json

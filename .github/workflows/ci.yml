@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  # main および develop への push / それらへの PR で実行
+  # 運用: main ← develop ← feature/〇〇
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  # Lintとテストを実行
+  lint-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Node.js 20をセットアップ
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      # 依存関係をインストール
+      - name: Install dependencies
+        run: npm ci
+
+      # Lintを実行
+      - name: Run lint
+        run: npm run lint
+
+      # テストを実行
+      - name: Run tests
+        run: npm run test:run

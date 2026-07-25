@@ -7,4 +7,4 @@
 | [github-actions-workflow.md](./github-actions-workflow.md) | GitHub Actions ワークフローの導入（CI） |
 | [eslint-clean-architecture.md](./eslint-clean-architecture.md) | ESLint とクリーンアーキテクチャ（import 制限ルール） |
 | [e2e-testing-with-playwright.md](./e2e-testing-with-playwright.md) | E2E テスト（Playwright）の使い方・実行手順 |
-| [deploy-vercel-supabase.md](./deploy-vercel-supabase.md) | Vercel + Supabase 本番デプロイ手順 |
+| [deploy-vercel-supabase.md](./deploy-vercel-supabase.md) | Vercel + Supabase 本番デプロイ手順（[公開デモ](https://cooking-recipe-liard.vercel.app/)） |

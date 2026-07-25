@@ -1,5 +1,11 @@
 # Vercel + Supabase 本番デプロイ手順
 
+## 公開 URL
+
+| 環境 | URL | 備考 |
+|------|-----|------|
+| **本番（Vercel Production）** | [https://cooking-recipe-liard.vercel.app/](https://cooking-recipe-liard.vercel.app/) | README にも掲載 |
+
 ## 概要
 
 | 環境 | Git ブランチ | ホスティング | BaaS |
@@ -50,8 +56,8 @@ Dashboard → **Authentication** → **URL Configuration**
 
 | 項目 | 本番例 |
 |------|--------|
-| **Site URL** | `https://your-app.vercel.app` |
-| **Redirect URLs** | `https://your-app.vercel.app/**` |
+| **Site URL** | `https://cooking-recipe-liard.vercel.app` |
+| **Redirect URLs** | `https://cooking-recipe-liard.vercel.app/**` |
 
 Preview 環境（`develop` ブランチ）も使う場合は、Vercel Preview URL も追加します。
 
@@ -137,7 +143,9 @@ Vercel に以下を設定:
 
 ## 4. デプロイ後チェックリスト
 
-- [ ] トップページ（`/top`）が表示される
+公開 URL: [https://cooking-recipe-liard.vercel.app/](https://cooking-recipe-liard.vercel.app/)
+
+- [ ] ランディングページ（`/`）が表示される
 - [ ] 未ログインで保護ルート → `/login` へリダイレクト
 - [ ] 新規登録 → メール確認 → ログイン
 - [ ] プロフィール作成（`/profile/new`）

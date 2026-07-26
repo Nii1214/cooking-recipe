@@ -1,4 +1,5 @@
 import { AuthError } from '@supabase/supabase-js';
+import { ERROR_MESSAGES } from '@/constants/error-messages';
 
 /**
  * エラーコードとメッセージのマッピング
@@ -11,6 +12,7 @@ const ERROR_CODE_MAP: Record<string, string> = {
     'email_address_invalid': 'メールアドレスの形式が正しくありません',
     'weak_password': 'パスワードが弱すぎます。より強力なパスワードを設定してください',
     'signup_disabled': '新規登録は現在受け付けていません',
+    'anonymous_provider_disabled': 'ゲストログインは現在利用できません（Anonymous Sign-Ins が無効です）',
     
     // ログイン関連
     'invalid_credentials': 'メールアドレスまたはパスワードが正しくありません',
@@ -36,6 +38,10 @@ export function getAuthErrorMessage(error: unknown): string {
     }
 
     const authError = error as AuthError;
+
+    if (error.message === 'GUEST_LOGIN_FAILED') {
+        return ERROR_MESSAGES.GUEST_LOGIN_FAILED;
+    }
     
     // エラーコードから直接メッセージを取得
     if ('code' in authError && typeof authError.code === 'string') {

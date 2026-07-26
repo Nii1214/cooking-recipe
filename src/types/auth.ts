@@ -7,3 +7,4 @@ export type AuthResult =
 // エイリアス
 export type SignupResult = AuthResult;
 export type LoginResult = AuthResult;
+export type GuestLoginResult = AuthResult;

@@ -18,4 +18,5 @@ export type LoginInput = {
 export interface AuthRepository {
     signup(input: SignupInput): Promise<User>;
     login(input: LoginInput) : Promise<User>;
+    signInAnonymously(): Promise<User>;
 }

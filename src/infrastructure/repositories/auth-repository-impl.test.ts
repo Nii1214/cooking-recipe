@@ -16,6 +16,7 @@ describe('AuthRepositoryImpl', () => {
       auth: {
         signUp: ReturnType<typeof vi.fn>;
         signInWithPassword: ReturnType<typeof vi.fn>;
+        signInAnonymously: ReturnType<typeof vi.fn>;
       };
     };
     let mockSupabaseClient: MockSupabaseClient;
@@ -29,6 +30,7 @@ describe('AuthRepositoryImpl', () => {
       auth: {
         signUp: vi.fn(),
         signInWithPassword: vi.fn(),
+        signInAnonymously: vi.fn(),
       },
     };
 
@@ -157,6 +159,51 @@ describe('AuthRepositoryImpl', () => {
             password: 'password123',
           })
         ).rejects.toThrow('LOGIN_FAILED');
+      });
+    });
+
+    describe('signInAnonymously 関数', () => {
+      it('成功時に User オブジェクトを返す', async () => {
+        const mockUser = {
+          id: 'guest-user-id',
+          email: null,
+          created_at: '2024-01-01T00:00:00Z',
+        };
+
+        mockSupabaseClient.auth.signInAnonymously.mockResolvedValue({
+          data: { user: mockUser },
+          error: null,
+        });
+
+        const result = await repository.signInAnonymously();
+
+        expect(result).toEqual({
+          id: 'guest-user-id',
+          email: '',
+          createdAt: new Date('2024-01-01T00:00:00Z'),
+        });
+
+        expect(mockSupabaseClient.auth.signInAnonymously).toHaveBeenCalled();
+      });
+
+      it('Supabase エラー時にエラーをスローする', async () => {
+        const authError = new AuthError('Disabled', 400, 'anonymous_provider_disabled');
+
+        mockSupabaseClient.auth.signInAnonymously.mockResolvedValue({
+          data: { user: null },
+          error: authError,
+        });
+
+        await expect(repository.signInAnonymously()).rejects.toThrow(authError);
+      });
+
+      it('data.user が null の場合に GUEST_LOGIN_FAILED エラーをスローする', async () => {
+        mockSupabaseClient.auth.signInAnonymously.mockResolvedValue({
+          data: { user: null },
+          error: null,
+        });
+
+        await expect(repository.signInAnonymously()).rejects.toThrow('GUEST_LOGIN_FAILED');
       });
     });
 });

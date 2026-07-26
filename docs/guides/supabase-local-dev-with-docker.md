@@ -313,3 +313,15 @@ npx supabase start
 | --------------------- | ------------------------------------------------------------ |
 | `false`（デフォルト） | メール確認なしで即座にサインアップ完了。開発初期に便利       |
 | `true`                | 確認メールが Inbucket に届く。本番に近いフローをテストできる |
+
+### Q4. ゲストログインで「Anonymous Sign-Ins が無効」と表示される
+
+**A.** `supabase/config.toml` で `enable_anonymous_sign_ins = true` でも、**起動中の Supabase には反映されません**。再起動してください。
+
+```bash
+npm run supabase:restart
+# または
+npx supabase stop && npx supabase start
+```
+
+Supabase Cloud（本番）では Dashboard → Authentication → Providers → **Anonymous** を ON にします。

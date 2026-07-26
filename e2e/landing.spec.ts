@@ -17,6 +17,10 @@ test.describe("ランディングページ", () => {
     await expect(
       main.getByRole("link", { name: "ログイン" }),
     ).toBeVisible();
+
+    await expect(
+      main.getByRole("button", { name: "ゲストで試す" }).first(),
+    ).toBeVisible();
   });
 
   test("「無料ではじめる」から新規登録画面へ遷移する", async ({ page }) => {

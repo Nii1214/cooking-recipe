@@ -65,6 +65,18 @@ Preview 環境（`develop` ブランチ）も使う場合は、Vercel Preview UR
 https://*-your-team.vercel.app/**
 ```
 
+#### ゲストログイン（Anonymous Sign-Ins）
+
+ゲストログイン機能を使う場合は、**必ず** Anonymous Sign-Ins を有効にします。
+
+| 環境 | 手順 |
+|------|------|
+| **Supabase Cloud（本番・Preview）** | Dashboard → **Authentication** → **Providers** → **Anonymous** → **Enable anonymous sign-ins** を ON |
+| **CLI で設定を同期** | リポジトリの `supabase/config.toml` は `enable_anonymous_sign_ins = true` 済み。リンク済みなら `npx supabase config push` でも反映可能 |
+| **ローカル（Supabase CLI）** | `config.toml` 変更後は **`npx supabase stop && npx supabase start`** が必要（起動中のままでは反映されない） |
+
+> **よくある症状**: LP やログイン画面で「ゲストログインは現在利用できません」と表示される → 上記が未設定、またはローカル Supabase を再起動していない。
+
 ### 1-3. API キーを控える
 
 Dashboard → **Project Settings** → **API**
@@ -189,6 +201,15 @@ npx supabase db push
 ### メール確認リンクが localhost を指す
 
 Supabase Dashboard → Auth → URL Configuration の **Site URL** を本番 URL に更新。
+
+### 「ゲストログインは現在利用できません」と表示される
+
+LP・ログイン画面どちらでも同じ Server Action を使うため、**LP 固有の不具合ではありません**。
+
+| 環境 | 対処 |
+|------|------|
+| **ローカル** | `npm run supabase:restart`（`config.toml` の Anonymous 設定を反映） |
+| **Supabase Cloud** | Dashboard → Authentication → Providers → **Anonymous** を ON |
 
 ### ビルド失敗
 

@@ -17,6 +17,7 @@ export const ERROR_MESSAGES = {
     INVALID_CREDENTIALS: 'メールアドレスまたはパスワードが正しくありません',
     LOGIN_FAILED: 'ログインに失敗しました',
     SIGNUP_FAILED: 'ユーザー作成に失敗しました',
+    GUEST_LOGIN_FAILED: 'ゲストログインに失敗しました',
     
     // セッションエラー
     SESSION_EXPIRED: 'セッションの有効期限が切れました。再度ログインしてください',

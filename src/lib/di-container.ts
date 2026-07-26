@@ -2,6 +2,7 @@ import { AuthRepository } from "@/domain/repositories/auth-repository";
 import { AuthRepositoryImpl } from "@/infrastructure/repositories/auth-repository-impl";
 import { LoginUseCase } from "@/usecase/auth/login.usecase";
 import { SignupUseCase } from "@/usecase/auth/signup.usecase";
+import { GuestLoginUseCase } from "@/usecase/auth/guest-login.usecase";
 
 /**
  * 依存性注入コンテナ
@@ -40,6 +41,13 @@ export class DIContainer {
      */
     static getSignupUseCase(): SignupUseCase {
         return new SignupUseCase(this.getAuthRepository());
+    }
+
+    /**
+     * GuestLoginUseCaseのインスタンスを取得
+     */
+    static getGuestLoginUseCase(): GuestLoginUseCase {
+        return new GuestLoginUseCase(this.getAuthRepository());
     }
 
     // ============================================

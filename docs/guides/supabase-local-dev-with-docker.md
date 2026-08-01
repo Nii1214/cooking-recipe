@@ -85,13 +85,9 @@ service_role key: eyJhbGci...（ローカル用のサービスキー。外部に
 
 NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<上記の anon key>
-
-# サーバーサイドのみで使用する場合（Server Actions / API Routes）
-SUPABASE_SERVICE_ROLE_KEY=<上記の service_role key>
 ```
 
-> **注意**: `service_role key` はすべての RLS（Row Level Security）をバイパスするため、
-> クライアント側のコードには絶対に公開しないでください。
+> **注意**: `service_role key` は本アプリでは **使用しません**（ゲスト削除バッチは Supabase pg_cron + SQL で完結）。`.env.local` に設定する必要はありません。
 
 `.gitignore` に `.env.local` が含まれていない場合は必ず追加してください。
 
@@ -127,6 +123,22 @@ SUPABASE_SERVICE_ROLE_KEY=<上記の service_role key>
 | コマンド                | 説明                                                                                                                                 |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
 | `npx supabase db reset` | **⚠️ 既存データをすべて削除したうえで** DB を初期化し、`migrations/` と `seed.sql` を再適用する。データを残したい場合は使わないこと。 |
+
+---
+
+## ゲスト削除バッチのローカルテスト
+
+ゲストユーザー削除バッチ（pg_cron + SQL）はローカル Supabase でもテストできます。Vercel や `service_role` は不要です。
+
+1. `npx supabase db reset`（または `migration up`）でマイグレーション適用
+2. `npm run dev` → 「ゲストで試す」で匿名ユーザーを作成
+3. Studio（`http://127.0.0.1:54323`）→ SQL Editor で実行:
+   ```sql
+   SELECT public.cleanup_anonymous_users();
+   ```
+4. Authentication で匿名ユーザーが消えたことを確認
+
+詳細手順: [ゲストユーザー削除バッチ — 運用手順書](./guest-cleanup-batch-operations.md)
 
 ---
 
@@ -223,7 +235,7 @@ type RecipeRow = Database['public']['Tables']['recipes']['Row']
 ## セキュリティ上の注意点
 
 - `.env.local` は **絶対に git にコミットしない**
-- `service_role key` は `NEXT_PUBLIC_` プレフィックスをつけず、サーバーサイドのみで使用する
+- 本アプリは `service_role key` を使用しない（anon key のみ）
 - RLS（Row Level Security）を全テーブルで有効化し、ポリシーで適切なアクセス制御を行う
 - 本番環境の接続情報（URL・キー）はローカル開発環境とは別に管理する
 
@@ -284,7 +296,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 | 旧表記             | 新表記              | 用途                                                                  |
 | ------------------ | ------------------- | --------------------------------------------------------------------- |
 | `anon key`         | **Publishable key** | クライアント側で使用可。`NEXT_PUBLIC_SUPABASE_ANON_KEY` に設定する    |
-| `service_role key` | **Secret key**      | サーバー側専用。`NEXT_PUBLIC_` をつけず、絶対にクライアントに渡さない |
+| `service_role key` | **Secret key**      | Supabase CLI 起動時に表示されるが、**本アプリでは未使用**             |
 
 ---
 

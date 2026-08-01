@@ -332,15 +332,18 @@ Q1 / Q2 を踏まえ、案 A 採用時は次を前提とする。
 |------|------|
 | **権限** | 既存 RLS（`auth.uid()`）を維持。ゲストも本ユーザーと同様にデータ登録・操作可（サンドボックスは uid 単位） |
 | **`is_anonymous` 関門** | 第 1 段階では追加しない（Q2 参照） |
-| **データ寿命** | **日次バッチ**で匿名ユーザー（`auth.users.is_anonymous = true`）と関連 DB データを削除 |
+| **データ寿命** | **6 時間おきバッチ**（Supabase pg_cron + SQL）で匿名ユーザーと関連 DB データを削除 |
 | **FK** | `families.owner_id` に `ON DELETE CASCADE` を付与し、ユーザー削除時に家族ツリーも連鎖削除 |
 
-### 日次バッチ（後続 PR / 運用）
+### ゲスト削除バッチ（pg_cron + SQL）
 
-- Supabase Auth Admin API または DB 関数で `is_anonymous = true` かつ作成から 24h 超のユーザーを削除
+- **Supabase pg_cron + SQL 関数** `public.cleanup_anonymous_users()` で `is_anonymous = true` の全ユーザーを削除（6 時間おき）
 - `auth.users` 削除により、`profiles` / `recipes` / `family_members` / `families`（オーナー時）等が CASCADE
+- **Vercel / Auth Admin API / `service_role` は不使用**（プロジェクト方針に合わせ Supabase 内で完結）
 - S3 サムネイルの孤立ファイル削除は別途検討（第 2 段階）
 - 本登録（Identity Linking）済みユーザーは `is_anonymous = false` のため対象外
+
+運用手順: [ゲストユーザー削除バッチ — 運用手順書](../guides/guest-cleanup-batch-operations.md)
 
 ---
 

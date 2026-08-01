@@ -86,7 +86,7 @@ Dashboard → **Project Settings** → **API**
 | **Project URL** | Supabase API エンドポイント | `NEXT_PUBLIC_SUPABASE_URL` |
 | **anon public** | クライアント・Server Actions | `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
 
-> `service_role` キーは RLS をバイパスするため、**Vercel に設定しない**（本アプリは未使用）。
+> `service_role` キーは **本アプリでは使用しません**（ゲスト削除バッチは Supabase pg_cron + SQL で完結）。
 
 ---
 
@@ -164,6 +164,24 @@ Vercel に以下を設定:
 - [ ] 家族グループ作成（`/family`）
 - [ ] レシピ登録・一覧・検索
 - [ ] （S3 設定済みの場合）サムネイルアップロード
+- [ ] （ゲストログイン有効時）ゲストで試す → レシピ登録
+- [ ] （ゲスト削除バッチ）`npx supabase db push` 後、Dashboard → Cron Jobs に `cleanup-anonymous-users` がある
+
+### ゲストユーザー削除バッチ（6 時間おき）
+
+バッチは **Supabase 側**（pg_cron + SQL）で動作します。Vercel への追加 env は不要です。
+
+詳細: [ゲストユーザー削除バッチ — 運用手順書](./guest-cleanup-batch-operations.md)
+
+```bash
+npx supabase db push
+```
+
+Dashboard → **Integrations** → **Cron Jobs** でジョブを確認。手動実行:
+
+```sql
+SELECT public.cleanup_anonymous_users();
+```
 
 ---
 

@@ -8,7 +8,7 @@
 ## Features
 
 - [x] ゲストログイン（Anonymous Sign-In）
-- [ ] 日次バッチ（匿名ユーザー + 関連データ削除）
+- [x] ゲスト削除バッチ（pg_cron + SQL、6 時間おき）
 - [ ] Identity Linking（ゲスト → 本登録）
 - [ ] 家族への招待・参加 UI（ADR 005 では DB のみ、UI は後続）
 - [ ] ゲスト向け RLS 関門（`is_permanent_user()` 等）— 家族参加実装時

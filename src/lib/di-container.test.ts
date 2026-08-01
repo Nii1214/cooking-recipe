@@ -6,6 +6,7 @@ import { AuthRepository } from "@/domain/repositories/auth-repository";
 import { AuthRepositoryImpl } from "@/infrastructure/repositories/auth-repository-impl";
 import { LoginUseCase } from "@/usecase/auth/login.usecase";
 import { SignupUseCase } from "@/usecase/auth/signup.usecase";
+import { GuestLoginUseCase } from "@/usecase/auth/guest-login.usecase";
 
 describe("DIContainer", () => {
   beforeEach(() => {
@@ -21,19 +22,21 @@ describe("DIContainer", () => {
     const mock: AuthRepository = {
       login: vi.fn(),
       signup: vi.fn(),
+      signInAnonymously: vi.fn(),
     };
     DIContainer.setAuthRepositoryForTesting(mock);
 
     expect(DIContainer.getAuthRepository()).toBe(mock);
   });
 
-  it("getLoginUseCase / getSignupUseCase を返す", () => {
+  it("getLoginUseCase / getSignupUseCase / getGuestLoginUseCase を返す", () => {
     expect(DIContainer.getLoginUseCase()).toBeInstanceOf(LoginUseCase);
     expect(DIContainer.getSignupUseCase()).toBeInstanceOf(SignupUseCase);
+    expect(DIContainer.getGuestLoginUseCase()).toBeInstanceOf(GuestLoginUseCase);
   });
 
   it("resetForTesting でモックをクリアする", () => {
-    const mock: AuthRepository = { login: vi.fn(), signup: vi.fn() };
+    const mock: AuthRepository = { login: vi.fn(), signup: vi.fn(), signInAnonymously: vi.fn() };
     DIContainer.setAuthRepositoryForTesting(mock);
     DIContainer.resetForTesting();
 

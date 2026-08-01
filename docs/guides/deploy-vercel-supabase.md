@@ -1,5 +1,11 @@
 # Vercel + Supabase 本番デプロイ手順
 
+## 公開 URL
+
+| 環境 | URL | 備考 |
+|------|-----|------|
+| **本番（Vercel Production）** | [https://cooking-recipe-liard.vercel.app/](https://cooking-recipe-liard.vercel.app/) | README にも掲載 |
+
 ## 概要
 
 | 環境 | Git ブランチ | ホスティング | BaaS |
@@ -50,14 +56,26 @@ Dashboard → **Authentication** → **URL Configuration**
 
 | 項目 | 本番例 |
 |------|--------|
-| **Site URL** | `https://your-app.vercel.app` |
-| **Redirect URLs** | `https://your-app.vercel.app/**` |
+| **Site URL** | `https://cooking-recipe-liard.vercel.app` |
+| **Redirect URLs** | `https://cooking-recipe-liard.vercel.app/**` |
 
 Preview 環境（`develop` ブランチ）も使う場合は、Vercel Preview URL も追加します。
 
 ```
 https://*-your-team.vercel.app/**
 ```
+
+#### ゲストログイン（Anonymous Sign-Ins）
+
+ゲストログイン機能を使う場合は、**必ず** Anonymous Sign-Ins を有効にします。
+
+| 環境 | 手順 |
+|------|------|
+| **Supabase Cloud（本番・Preview）** | Dashboard → **Authentication** → **Providers** → **Anonymous** → **Enable anonymous sign-ins** を ON |
+| **CLI で設定を同期** | リポジトリの `supabase/config.toml` は `enable_anonymous_sign_ins = true` 済み。リンク済みなら `npx supabase config push` でも反映可能 |
+| **ローカル（Supabase CLI）** | `config.toml` 変更後は **`npx supabase stop && npx supabase start`** が必要（起動中のままでは反映されない） |
+
+> **よくある症状**: LP やログイン画面で「ゲストログインは現在利用できません」と表示される → 上記が未設定、またはローカル Supabase を再起動していない。
 
 ### 1-3. API キーを控える
 
@@ -68,7 +86,7 @@ Dashboard → **Project Settings** → **API**
 | **Project URL** | Supabase API エンドポイント | `NEXT_PUBLIC_SUPABASE_URL` |
 | **anon public** | クライアント・Server Actions | `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
 
-> `service_role` キーは RLS をバイパスするため、**Vercel に設定しない**（本アプリは未使用）。
+> `service_role` キーは **本アプリでは使用しません**（ゲスト削除バッチは Supabase pg_cron + SQL で完結）。
 
 ---
 
@@ -137,13 +155,33 @@ Vercel に以下を設定:
 
 ## 4. デプロイ後チェックリスト
 
-- [ ] トップページ（`/top`）が表示される
+公開 URL: [https://cooking-recipe-liard.vercel.app/](https://cooking-recipe-liard.vercel.app/)
+
+- [ ] ランディングページ（`/`）が表示される
 - [ ] 未ログインで保護ルート → `/login` へリダイレクト
 - [ ] 新規登録 → メール確認 → ログイン
 - [ ] プロフィール作成（`/profile/new`）
 - [ ] 家族グループ作成（`/family`）
 - [ ] レシピ登録・一覧・検索
 - [ ] （S3 設定済みの場合）サムネイルアップロード
+- [ ] （ゲストログイン有効時）ゲストで試す → レシピ登録
+- [ ] （ゲスト削除バッチ）`npx supabase db push` 後、Dashboard → Cron Jobs に `cleanup-anonymous-users` がある
+
+### ゲストユーザー削除バッチ（6 時間おき）
+
+バッチは **Supabase 側**（pg_cron + SQL）で動作します。Vercel への追加 env は不要です。
+
+詳細: [ゲストユーザー削除バッチ — 運用手順書](./guest-cleanup-batch-operations.md)
+
+```bash
+npx supabase db push
+```
+
+Dashboard → **Integrations** → **Cron Jobs** でジョブを確認。手動実行:
+
+```sql
+SELECT public.cleanup_anonymous_users();
+```
 
 ---
 
@@ -181,6 +219,15 @@ npx supabase db push
 ### メール確認リンクが localhost を指す
 
 Supabase Dashboard → Auth → URL Configuration の **Site URL** を本番 URL に更新。
+
+### 「ゲストログインは現在利用できません」と表示される
+
+LP・ログイン画面どちらでも同じ Server Action を使うため、**LP 固有の不具合ではありません**。
+
+| 環境 | 対処 |
+|------|------|
+| **ローカル** | `npm run supabase:restart`（`config.toml` の Anonymous 設定を反映） |
+| **Supabase Cloud** | Dashboard → Authentication → Providers → **Anonymous** を ON |
 
 ### ビルド失敗
 

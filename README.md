@@ -2,11 +2,22 @@
 
 家族の味を、ここに残そう。
 
-<!-- デモ URL が確定したらここに記載してください -->
-<!-- 🔗 [デモを見る](https://your-app.vercel.app) -->
+**[デモを見る](https://cooking-recipe-liard.vercel.app/)**
 
 **Tech Stack**:
 Next.js 16 &nbsp;|&nbsp; React 19 &nbsp;|&nbsp; TypeScript &nbsp;|&nbsp; Supabase &nbsp;|&nbsp; Tailwind CSS v4 &nbsp;|&nbsp; Vercel
+
+---
+
+## Live Demo
+
+| 項目 | URL |
+|------|-----|
+| 公開デモ | [https://cooking-recipe-liard.vercel.app/](https://cooking-recipe-liard.vercel.app/) |
+
+未ログインではランディングページ（`/`）が表示されます。レシピの登録・家族機能などはアカウント作成後に利用できます。
+
+デプロイ手順・環境構成は [`docs/guides/deploy-vercel-supabase.md`](./docs/guides/deploy-vercel-supabase.md) を参照してください。
 
 ---
 

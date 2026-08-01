@@ -50,4 +50,28 @@ export class AuthRepositoryImpl implements AuthRepository {
             createdAt: new Date(data.user.created_at),
         };
     }
+
+    /**
+     * 匿名（ゲスト）サインインを実行する
+     * @returns 作成または再利用された匿名ユーザー
+     */
+    async signInAnonymously(): Promise<User> {
+        const supabase = await createClient();
+
+        const { data, error } = await supabase.auth.signInAnonymously();
+
+        if (error) {
+            throw error;
+        }
+
+        if (!data.user) {
+            throw new Error('GUEST_LOGIN_FAILED');
+        }
+
+        return {
+            id: data.user.id,
+            email: data.user.email ?? '',
+            createdAt: new Date(data.user.created_at),
+        };
+    }
 }

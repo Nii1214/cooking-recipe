@@ -9,6 +9,7 @@ import {
   Users,
 } from "lucide-react";
 import { APP_NAME } from "@/constants/app";
+import { GuestLoginButton } from "@/presentation/components/auth/guest-login-button";
 import { Reveal } from "./Reveal";
 import { ScrollProgress } from "./ScrollProgress";
 
@@ -235,7 +236,7 @@ export function LandingPage() {
             </p>
 
             <div
-              className="lp-animate-in mt-9 flex flex-col gap-3 sm:flex-row sm:items-center"
+              className="lp-animate-in mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center"
               style={{ animationDelay: "240ms" }}
             >
               <Link
@@ -251,7 +252,17 @@ export function LandingPage() {
               >
                 ログイン
               </Link>
+              <GuestLoginButton
+                formClassName="w-full sm:w-auto"
+                buttonClassName="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-emerald-300 bg-emerald-50/50 px-7 py-3.5 text-sm font-semibold text-emerald-800 transition-colors hover:bg-emerald-50 disabled:opacity-50 sm:w-auto"
+              />
             </div>
+            <p
+              className="lp-animate-in mt-3 text-xs leading-relaxed text-gray-500"
+              style={{ animationDelay: "280ms" }}
+            >
+              ゲストで試す場合、アカウント登録なしですぐ体験できます（データは一定期間後に削除されます）
+            </p>
 
             <div
               className="lp-animate-in mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-gray-500"
@@ -540,13 +551,19 @@ export function LandingPage() {
             <p className="relative mx-auto mt-4 max-w-md text-sm leading-relaxed text-emerald-50/90">
               完璧なレシピでなくていい。今あるメモを、そのまま残すところから始められます。
             </p>
-            <Link
-              href="/signup"
-              className="lp-shimmer group relative mt-9 inline-flex items-center justify-center gap-2 overflow-hidden rounded-lg bg-white px-9 py-3.5 text-sm font-semibold text-emerald-800 shadow-lg transition-all hover:bg-emerald-50"
-            >
-              {APP_NAME}をはじめる
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-            </Link>
+            <div className="relative mt-9 flex flex-col items-center gap-4">
+              <Link
+                href="/signup"
+                className="lp-shimmer group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-lg bg-white px-9 py-3.5 text-sm font-semibold text-emerald-800 shadow-lg transition-all hover:bg-emerald-50"
+              >
+                {APP_NAME}をはじめる
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              </Link>
+              <GuestLoginButton
+                formClassName="w-full max-w-xs"
+                buttonClassName="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-white/40 bg-white/10 px-9 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-white/20 disabled:opacity-50"
+              />
+            </div>
           </div>
         </Reveal>
       </section>

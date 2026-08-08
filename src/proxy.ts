@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { AUTH_CALLBACK_PATH } from "@/constants/auth";
 
 /** 認証なしでアクセスできるパス */
 const PUBLIC_PATHS = [
@@ -7,6 +8,8 @@ const PUBLIC_PATHS = [
     "/login",
     "/signup",
     "/signup/verify-email",
+    // 確認メールのリンクはセッション確立前に到達するため公開が必須
+    AUTH_CALLBACK_PATH,
     // LP デザイン案の検証用。採用案の反映後に削除する
     "/lp",
 ];

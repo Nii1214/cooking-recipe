@@ -1,13 +1,20 @@
 import { AuthRepository, LoginInput, SignupInput, User } from "@/domain/repositories/auth-repository";
+import { AUTH_CALLBACK_PATH } from "@/constants/auth";
+import { getSiteOrigin } from "@/lib/site-url";
 import { createClient } from "@/lib/supabase/server";
 
 export class AuthRepositoryImpl implements AuthRepository {
     async signup(input: SignupInput): Promise<User> {
         const supabase = await createClient();
+        const origin = await getSiteOrigin();
 
         const  {data, error} = await supabase.auth.signUp({
             email: input.email,
             password: input.password,
+            options: {
+                // 確認メールのリンク先。Supabase の Redirect URLs に登録した URL と一致させること
+                emailRedirectTo: `${origin}${AUTH_CALLBACK_PATH}`,
+            },
         });
 
         // エラーチェック

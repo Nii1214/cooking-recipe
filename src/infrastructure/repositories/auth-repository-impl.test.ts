@@ -9,6 +9,10 @@ import { createClient } from '@/lib/supabase/server';
 vi.mock('@/lib/supabase/server', () => ({
     createClient: vi.fn(),
 }));
+
+vi.mock('@/lib/site-url', () => ({
+    getSiteOrigin: vi.fn().mockResolvedValue('https://example.com'),
+}));
   
 describe('AuthRepositoryImpl', () => {
     let repository: AuthRepositoryImpl;
@@ -67,6 +71,9 @@ describe('AuthRepositoryImpl', () => {
         expect(mockSupabaseClient.auth.signUp).toHaveBeenCalledWith({
           email: 'test@example.com',
           password: 'password123',
+          options: {
+            emailRedirectTo: 'https://example.com/auth/callback',
+          },
         });
       });
   

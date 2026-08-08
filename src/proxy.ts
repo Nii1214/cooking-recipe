@@ -2,7 +2,14 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 /** 認証なしでアクセスできるパス */
-const PUBLIC_PATHS = ["/", "/login", "/signup", "/signup/verify-email"];
+const PUBLIC_PATHS = [
+    "/",
+    "/login",
+    "/signup",
+    "/signup/verify-email",
+    // LP デザイン案の検証用。採用案の反映後に削除する
+    "/lp",
+];
 
 export async function proxy(request: NextRequest) {
     let supabaseResponse = NextResponse.next({ request });

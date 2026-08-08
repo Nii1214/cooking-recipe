@@ -93,53 +93,6 @@
    ランディングページ用のアニメーション
    - prefers-reduced-motion を尊重して無効化する
    ======================================== */
-@keyframes lp-fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(28px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes lp-float {
-  0%,
-  100% {
-    transform: translateY(0) rotate(var(--lp-rot, 0deg));
-  }
-  50% {
-    transform: translateY(-12px) rotate(var(--lp-rot, 0deg));
-  }
-}
-
-@keyframes lp-blob {
-  0%,
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
-  33% {
-    transform: translate(24px, -18px) scale(1.06);
-  }
-  66% {
-    transform: translate(-16px, 12px) scale(0.96);
-  }
-}
-
-.lp-animate-in {
-  opacity: 0;
-  animation: lp-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-.lp-float {
-  animation: lp-float 7s ease-in-out infinite;
-}
-
-.lp-blob {
-  animation: lp-blob 20s ease-in-out infinite;
-}
-
 .lp-reveal {
   opacity: 0;
   transform: translateY(28px);
@@ -153,77 +106,11 @@
   transform: none;
 }
 
-@keyframes lp-marquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-@keyframes lp-gradient {
-  0%,
-  100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-}
-
-@keyframes lp-shimmer {
-  100% {
-    transform: translateX(180%);
-  }
-}
-
-.lp-marquee {
-  animation: lp-marquee 32s linear infinite;
-}
-
-.lp-gradient-text {
-  background-size: 200% auto;
-  animation: lp-gradient 6s ease-in-out infinite;
-}
-
-.lp-shimmer::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 40%;
-  transform: translateX(-180%) skewX(-20deg);
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.45),
-    transparent
-  );
-  pointer-events: none;
-}
-
-.lp-shimmer:hover::after {
-  animation: lp-shimmer 0.9s ease;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .lp-animate-in,
-  .lp-float,
-  .lp-blob,
-  .lp-marquee,
-  .lp-gradient-text {
-    animation: none !important;
-    opacity: 1 !important;
-  }
   .lp-reveal {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
-  }
-  .lp-shimmer:hover::after {
-    animation: none !important;
   }
 }
 

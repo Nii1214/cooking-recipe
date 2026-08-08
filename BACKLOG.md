@@ -15,7 +15,7 @@
 
 ## Bugs
 
-- [ ] `/auth/callback`（登録メールからリンクを踏むと存在しないリンクに飛ばされる）
+- [x] `/auth/callback`（登録メールからリンクを踏むと存在しないリンクに飛ばされる）
 
 
 ## Ops
@@ -23,7 +23,9 @@
 - [ ] Vercel: Preview デプロイを止める（Ignored Build Step → Only build production）
 - [ ] 本番 Supabase: Anonymous Sign-Ins を ON
 - [ ] 本番 Supabase: `npx supabase db push`（CASCADE マイグレーション含む）
-- [ ] 本番 Supabase: Site URL を本番 URL に設定（確認メールの localhost 問題）
+- [ ] 本番 Supabase: Site URL / Redirect URLs を本番 URL に設定（確認メールの localhost 問題）
+- [ ] 本番ホスティング: `NEXT_PUBLIC_SITE_URL` に本番 URL を設定
+  - 手順: [docs/implementation/auth/email-confirmation-callback.md](docs/implementation/auth/email-confirmation-callback.md)
 
 
 ## Inbox（未分類・殴り書き）

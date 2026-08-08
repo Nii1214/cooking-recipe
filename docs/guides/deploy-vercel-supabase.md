@@ -126,6 +126,7 @@ Vercel に以下を設定:
 |------|:----------:|:-------:|:-------------:|
 | `NEXT_PUBLIC_SUPABASE_URL` | o | o | o |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | o | o | o |
+| `NEXT_PUBLIC_SITE_URL` | o | - | - |
 | `AWS_REGION` | o | o | - |
 | `AWS_S3_BUCKET_NAME` | o | o | - |
 | `AWS_ACCESS_KEY_ID` | o | o | - |
@@ -133,6 +134,16 @@ Vercel に以下を設定:
 
 - **Production** … `main` マージ時
 - **Preview** … `develop` や PR ごとのプレビュー URL
+
+> `NEXT_PUBLIC_SITE_URL` は確認メールのリンク先（`{値}/auth/callback`）のベースになります。
+> **スキーム + ドメインのみ**を設定してください（パス・末尾スラッシュは不要）。
+>
+> ```
+> NEXT_PUBLIC_SITE_URL=https://cooking-recipe-liard.vercel.app
+> ```
+>
+> Preview はデプロイごとに URL が変わるため未設定にします。未設定時はリクエストのホストから
+> 組み立てられるので、Redirect URLs にプレビュー URL が登録されていれば動作します。
 
 テンプレートはリポジトリルートの [`.env.example`](../../.env.example) を参照。
 
@@ -218,7 +229,11 @@ npx supabase db push
 
 ### メール確認リンクが localhost を指す
 
-Supabase Dashboard → Auth → URL Configuration の **Site URL** を本番 URL に更新。
+1. Supabase Dashboard → Auth → URL Configuration の **Site URL** を本番 URL に更新
+2. **Redirect URLs** に本番 URL が含まれているか確認（含まれない戻り先は Site URL に差し替えられる）
+3. Vercel の `NEXT_PUBLIC_SITE_URL` を本番 URL に設定して再デプロイ
+
+しくみの詳細: [メール確認と /auth/callback のしくみ](../tips/email-confirmation-and-auth-callback.md)
 
 ### 「ゲストログインは現在利用できません」と表示される
 
@@ -244,6 +259,7 @@ npm run test:run
 ## 関連ドキュメント
 
 - [Supabase ローカル開発](./supabase-local-dev-with-docker.md)
+- [メール確認と /auth/callback のしくみ](../tips/email-confirmation-and-auth-callback.md)
 - [Git ブランチ運用](./git-branch-workflow.md)
 - [ADR: Vercel](../adr/03-Vercel.md)
 - [環境変数テンプレート](../../.env.example)

@@ -17,7 +17,7 @@ app 層が「Next.js の世界」と「ビジネスロジックの世界（useca
 具体的には、次のことをこの層でやります：
 
 1. **FormData のパース** … `formData.get('email')` などを行い、usecase に渡せる形に変換する
-2. **deps の組み立て** … どのリポジトリ実装（`AuthRepositoryImpl` や `createRecipe` 関数）を使うかを決めて、usecase に渡す
+2. **deps の組み立て** … どのリポジトリ実装（`signup` や `createRecipe` 関数）を使うかを決めて、usecase に渡す
 3. **リダイレクト** … usecase の結果に応じて `redirect('/top')` などを呼ぶ
 4. **エラーの整形** … usecase や infrastructure から返ったエラーを画面用のメッセージに変換する
 

@@ -24,7 +24,7 @@
 |---------|------|
 | `src/lib/site-url.ts` | `getSiteOrigin()`。絶対 URL のベースを解決する |
 | `src/constants/auth.ts` | コールバックのパスと遷移先の定数 |
-| `src/infrastructure/repositories/auth-repository-impl.ts` | `signUp` に `emailRedirectTo` を渡す |
+| `src/infrastructure/repositories/auth/auth-repository-impl.ts` | `signUp` に `emailRedirectTo` を渡す |
 | `src/app/auth/callback/route.ts` | `code` / `token_hash` を検証してセッションを確立し、`/top` へ遷移 |
 | `src/proxy.ts` | `/auth/callback` を公開パスに追加（セッション確立前に到達するため） |
 | `src/app/(auth)/login/page.tsx` | `?authError=1` のとき、リンク無効の案内を表示 |

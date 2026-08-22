@@ -193,7 +193,7 @@ Vercel のようなホスティングでは、リクエストは一度プロキ�
 
 という二段構えになっています。**本番で環境変数を設定することが、この防御の 1 段目**です。
 
-### 6-3. `src/infrastructure/repositories/auth-repository-impl.ts`
+### 6-3. `src/infrastructure/repositories/auth/auth-repository-impl.ts`
 
 ```ts
 await supabase.auth.signUp({
@@ -332,7 +332,7 @@ Supabase を使うと認証の難しい部分は肩代わりしてもらえま�
 |---------|------|
 | `src/constants/auth.ts` | コールバックのパスと遷移先の定数 |
 | `src/lib/site-url.ts` | 絶対 URL のベースを解決 |
-| `src/infrastructure/repositories/auth-repository-impl.ts` | `signUp` に `emailRedirectTo` を渡す |
+| `src/infrastructure/repositories/auth/auth-repository-impl.ts` | `signUp` に `emailRedirectTo` を渡す |
 | `src/app/auth/callback/route.ts` | `code` / `token_hash` を検証してセッションを確立 |
 | `src/proxy.ts` | 公開パスの管理 |
 | `src/app/(auth)/login/page.tsx` | リンク無効時の案内表示 |

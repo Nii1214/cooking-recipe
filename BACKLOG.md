@@ -2,14 +2,13 @@
 
 ## Refactors
 
-- [ ] auth の deps パターン統一（DIContainer → deps 直渡し）→ [ADR 007](docs/adr/07-guest-login.md)
+- [x] auth の deps パターン統一（DIContainer → deps 直渡し）→ [ADR 007](docs/adr/07-guest-login.md)
 - [ ] 認証・認可まわりの責務整理（usecase / action / proxy の境界）
 
 ## Features
 
 - [x] ゲストログイン（Anonymous Sign-In）
 - [x] ゲスト削除バッチ（pg_cron + SQL、6 時間おき）
-- [ ] Identity Linking（ゲスト → 本登録）
 - [ ] 家族への招待・参加 UI（ADR 005 では DB のみ、UI は後続）
 - [ ] ゲスト向け RLS 関門（`is_permanent_user()` 等）— 家族参加実装時
 

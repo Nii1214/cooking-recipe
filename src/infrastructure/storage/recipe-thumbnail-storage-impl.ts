@@ -1,53 +1,35 @@
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import type {
   PutRecipeThumbnailPayload,
   RecipeThumbnailStorage,
 } from "@/domain/repositories/recipe/recipe-thumbnail-storage";
+import { RECIPE_THUMBNAIL_BUCKET } from "@/constants/recipe-thumbnail-upload";
+import { createAuthedClient } from "@/lib/supabase/server";
 
-const allowedExt = new Set(["jpg", "jpeg", "png", "webp", "gif"]);
+/**
+ * 変換済みサムネイルを Supabase Storage に保存する
+ * @param payload 作者 ID と保存用のバイト列
+ * @returns バケット内のオブジェクトパス（{authorId}/{uuid}.webp）
+ */
+export const putRecipeThumbnail = async (
+  payload: PutRecipeThumbnailPayload,
+): Promise<{ path: string }> => {
+  const { supabase } = await createAuthedClient();
+  const path = `${payload.authorId}/${crypto.randomUUID()}.${payload.extension}`;
 
-function extensionFromFilename(filename: string): string {
-  const parts = filename.split(".");
-  const raw = parts[parts.length - 1].toLowerCase();
-  if (allowedExt.has(raw)) return raw === "jpeg" ? "jpg" : raw;
-  return "jpg";
-}
+  const { error } = await supabase.storage
+    .from(RECIPE_THUMBNAIL_BUCKET)
+    .upload(path, Buffer.from(payload.body), {
+      contentType: payload.contentType,
+      upsert: false,
+    });
 
-function createS3Client(): S3Client {
-  const region = process.env.AWS_REGION;
-  const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
-  const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
-
-  if (!region || !accessKeyId || !secretAccessKey) {
-    throw new Error("AWS の設定が不足しています。.env.local を確認してください。");
+  if (error) {
+    throw new Error(error.message);
   }
 
-  return new S3Client({
-    region,
-    credentials: { accessKeyId, secretAccessKey },
-  });
-}
+  return { path };
+};
 
 export const recipeThumbnailStorageImpl: RecipeThumbnailStorage = {
-  async put(payload: PutRecipeThumbnailPayload): Promise<{ path: string }> {
-    const bucket = process.env.AWS_S3_BUCKET_NAME;
-    if (!bucket) {
-      throw new Error("AWS_S3_BUCKET_NAME が設定されていません。");
-    }
-
-    const ext = extensionFromFilename(payload.originalFilename);
-    const path = `recipes/${payload.authorId}/${crypto.randomUUID()}.${ext}`;
-
-    const s3 = createS3Client();
-    await s3.send(
-      new PutObjectCommand({
-        Bucket: bucket,
-        Key: path,
-        Body: payload.body,
-        ContentType: payload.contentType,
-      }),
-    );
-
-    return { path };
-  },
+  put: putRecipeThumbnail,
 };

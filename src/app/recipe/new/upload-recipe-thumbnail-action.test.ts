@@ -23,6 +23,10 @@ vi.mock("@/infrastructure/storage/recipe-thumbnail-storage-impl", () => ({
   recipeThumbnailStorageImpl: { put: vi.fn() },
 }));
 
+vi.mock("@/infrastructure/image/recipe-thumbnail-image-processor-impl", () => ({
+  recipeThumbnailImageProcessorImpl: { toStorable: vi.fn() },
+}));
+
 describe("uploadRecipeThumbnailAction", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -32,7 +36,7 @@ describe("uploadRecipeThumbnailAction", () => {
     } as never);
     vi.mocked(uploadRecipeThumbnailUsecase).mockResolvedValue({
       success: true,
-      path: "recipes/user-1/abc.jpg",
+      path: "user-1/abc.webp",
     });
   });
 
@@ -82,7 +86,7 @@ describe("uploadRecipeThumbnailAction", () => {
 
     expect(result).toEqual({
       success: true,
-      path: "recipes/user-1/abc.jpg",
+      path: "user-1/abc.webp",
     });
   });
 

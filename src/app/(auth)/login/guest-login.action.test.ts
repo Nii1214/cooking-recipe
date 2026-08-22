@@ -1,8 +1,7 @@
 // npm run test:run -- src/app/(auth)/login/guest-login.action.test.ts
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { guestLoginAction } from './guest-login.action';
-import { AuthRepository } from '@/domain/repositories/auth-repository';
-import { DIContainer } from '@/lib/di-container';
+import { signInAnonymously } from '@/infrastructure/repositories/auth/auth-repository-impl';
 import { GuestLoginResult } from '@/types/auth';
 import { redirect } from 'next/navigation';
 
@@ -12,6 +11,10 @@ vi.mock('next/navigation', () => ({
     err.digest = `NEXT_REDIRECT;replace;${path};307;`;
     throw err;
   }),
+}));
+
+vi.mock('@/infrastructure/repositories/auth/auth-repository-impl', () => ({
+  signInAnonymously: vi.fn(),
 }));
 
 /**
@@ -29,22 +32,12 @@ function expectErrorResultExists(
 }
 
 describe('guestLoginAction 関数', () => {
-  let mockRepository: AuthRepository;
-
   beforeEach(() => {
     vi.clearAllMocks();
-    DIContainer.resetForTesting();
-
-    mockRepository = {
-      signup: vi.fn(),
-      login: vi.fn(),
-      signInAnonymously: vi.fn(),
-    };
-    DIContainer.setAuthRepositoryForTesting(mockRepository);
   });
 
   it('成功時に /top へリダイレクトする', async () => {
-    vi.mocked(mockRepository.signInAnonymously).mockResolvedValue({
+    vi.mocked(signInAnonymously).mockResolvedValue({
       id: 'guest-1',
       email: '',
       createdAt: new Date(),
@@ -52,13 +45,11 @@ describe('guestLoginAction 関数', () => {
 
     await expect(guestLoginAction(null)).rejects.toThrow('NEXT_REDIRECT');
     expect(vi.mocked(redirect)).toHaveBeenCalledWith('/top');
-    expect(mockRepository.signInAnonymously).toHaveBeenCalledOnce();
+    expect(signInAnonymously).toHaveBeenCalledOnce();
   });
 
   it('予期しないエラー時にエラーメッセージを返す', async () => {
-    vi.mocked(mockRepository.signInAnonymously).mockRejectedValue(
-      new Error('GUEST_LOGIN_FAILED')
-    );
+    vi.mocked(signInAnonymously).mockRejectedValue(new Error('GUEST_LOGIN_FAILED'));
 
     const result = await guestLoginAction(null);
 

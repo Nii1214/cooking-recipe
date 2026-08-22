@@ -60,8 +60,7 @@
 ### ファイル名・実装名
 
 - **ファイル名** … `{関心事}-repository-impl.ts`（例: `recipe-repository-impl.ts`, `auth-repository-impl.ts`）
-- **クラスで実装する場合** … `{関心事}RepositoryImpl`（例: `AuthRepositoryImpl`）
-- **関数で実装する場合** … 下記のメソッド命名規則に合わせた関数名（例: `createRecipe`, `saveIngredients`）
+- **関数名** … 下記のメソッド命名規則に合わせた名前（例: `createRecipe`, `saveIngredients`）。契約のメソッド名と揃えます（例: `signup`, `login`）
 
 ### メソッド・関数の命名（永続化の意図を表す）
 
@@ -144,33 +143,27 @@ export const createRecipe = async (input: RecipeInput): Promise<Recipe> => {
 };
 ```
 
-クラスで実装する場合の例（`AuthRepository` インターフェースを実装）:
+認証まわりの例（`AuthRepository` の契約に沿った関数）:
 
 ```ts
 // auth-repository-impl.ts
-import type { AuthRepository, LoginInput, SignupInput, User } from "@/domain/repositories/auth-repository";
+import type { SignupInput, User } from "@/domain/repositories/auth-repository";
 import { createClient } from "@/lib/supabase/server";
 
-export class AuthRepositoryImpl implements AuthRepository {
-  async signup(input: SignupInput): Promise<User> {
-    const supabase = await createClient();
-    const { data, error } = await supabase.auth.signUp({
-      email: input.email,
-      password: input.password,
-    });
-    if (error) throw error;
-    if (!data.user) throw new Error("SIGNUP_FAILED");
-    return {
-      id: data.user.id,
-      email: data.user.email!,
-      createdAt: new Date(data.user.created_at),
-    };
-  }
-
-  async login(input: LoginInput): Promise<User> {
-    // ...
-  }
-}
+export const signup = async (input: SignupInput): Promise<User> => {
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signUp({
+    email: input.email,
+    password: input.password,
+  });
+  if (error) throw error;
+  if (!data.user) throw new Error("SIGNUP_FAILED");
+  return {
+    id: data.user.id,
+    email: data.user.email!,
+    createdAt: new Date(data.user.created_at),
+  };
+};
 ```
 
 ### ❌ NG 例：ビジネスロジックをここに書く

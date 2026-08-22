@@ -51,15 +51,16 @@ usecase に「機能のシナリオ」を切り出すことで、
 
 - **文脈（関心事）ごとにサブディレクトリ**で分けます（例: `recipe/`, `auth/`）。`domain/repositories` や `domain/models` の文脈と対応させます
 - 1 ユースケース 1 ファイルを基本とします。関連が強い場合は同じサブディレクトリにまとめます
-- クラスで書く場合はコンストラクタでリポジトリのインターフェースを受け取り、関数で書く場合は引数でリポジトリ（またはその関数）を受け取るようにし、**具象実装を import しません**
+- 引数の `deps` でリポジトリの操作（関数）を受け取るようにし、**具象実装を import しません**
 
 ---
 
 ## 命名規則
 
-- **ファイル名** … `{操作}-{関心事}-usecase.ts` または `{操作}.usecase.ts`（例: `create-recipe-usecase.ts`, `signup.usecase.ts`, `login.usecase.ts`）
-- **関数で書く場合** … `{操作}{関心事}Usecase` または `{操作}Usecase`（例: `createRecipeUsecase`）
-- **クラスで書く場合** … `{操作}UseCase`（例: `SignupUseCase`, `LoginUseCase`）。実行メソッドは `execute` に揃えるとよいです
+- **ファイル名** … `{操作}-{関心事}-usecase.ts`（例: `create-recipe-usecase.ts`, `signup-usecase.ts`, `login-usecase.ts`）
+- **関数名** … `{操作}{関心事}Usecase` または `{操作}Usecase`（例: `createRecipeUsecase`, `signupUsecase`）
+- **deps の型名** … `{操作}{関心事}Deps` または `{操作}Deps`（例: `CreateRecipeDeps`, `SignupDeps`）
+- **テスト用 deps** … `{ユースケース名}DepsForTest` を `{ユースケース名}-deps-for-test.ts` に置きます（例: `signupDepsForTest`）
 
 ---
 
@@ -101,38 +102,43 @@ usecase に「機能のシナリオ」を切り出すことで、
 
 ## コード例
 
-### クラスで実装するパターン（認証などシンプルなシナリオに向いている）
+### 単一のリポジトリ操作に委譲するパターン（認証などシンプルなシナリオ）
 
-コンストラクタでリポジトリのインターフェースを受け取ります。  
-実装（`AuthRepositoryImpl`）は app 層で生成して渡すので、usecase は import しません。
+`deps` に「必要な操作の関数の型」だけを宣言します。  
+実装は app 層から渡すので、usecase は infrastructure を import しません。
 
 ```ts
-// auth/signup.usecase.ts
-import type { AuthRepository, SignupInput } from "@/domain/repositories/auth-repository";
+// auth/signup-usecase.ts
+import type { SignupInput, User } from "@/domain/repositories/auth-repository";
 import type { SignupResult } from "@/types/auth";
 import { isValidEmail, isValidPasswordLength } from "@/utils/validation";
 import { ERROR_MESSAGES } from "@/constants/error-messages";
 
-export class SignupUseCase {
-  // コンストラクタで「AuthRepository という契約を満たす何か」を受け取る
-  constructor(private authRepository: AuthRepository) {}
+const PASSWORD_MIN_LENGTH = 8;
 
-  async execute(input: SignupInput): Promise<SignupResult> {
-    // バリデーションはここで行う
-    if (!isValidEmail(input.email)) {
-      return { success: false, error: ERROR_MESSAGES.EMAIL_INVALID_FORMAT };
-    }
-    if (!isValidPasswordLength(input.password, 8)) {
-      return { success: false, error: ERROR_MESSAGES.PASSWORD_MIN_LENGTH(8) };
-    }
-    // 実装の詳細は知らず、「signup できる何か」に委譲するだけ
-    const user = await this.authRepository.signup(input);
-    return { success: true, user };
+// 「signup できる関数を渡してください」という型だけを定義
+export type SignupDeps = {
+  signup: (input: SignupInput) => Promise<User>;
+};
+
+export const signupUsecase = async (
+  input: SignupInput,
+  deps: SignupDeps,
+): Promise<SignupResult> => {
+  // バリデーションはここで行う
+  if (!isValidEmail(input.email)) {
+    return { success: false, error: ERROR_MESSAGES.EMAIL_INVALID_FORMAT };
   }
-}
+  if (!isValidPasswordLength(input.password, PASSWORD_MIN_LENGTH)) {
+    return { success: false, error: ERROR_MESSAGES.PASSWORD_MIN_LENGTH(PASSWORD_MIN_LENGTH) };
+  }
+  // 実装の詳細は知らず、渡された関数に委譲するだけ
+  const user = await deps.signup(input);
+  return { success: true, user };
+};
 ```
 
-### 関数で実装するパターン（レシピ作成など複数リポジトリを組み合わせるシナリオに向いている）
+### 複数リポジトリを組み合わせるパターン（レシピ作成など）
 
 引数の `deps` に「必要な操作の関数の型」を宣言して受け取ります。  
 app 層で具体的な実装関数を `deps` に入れて渡します。

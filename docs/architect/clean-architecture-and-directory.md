@@ -186,7 +186,7 @@ sequenceDiagram
     participant Page as app/(auth)/signup/page
     participant Form as presentation/signup-form
     participant Action as app/(auth)/signup/signup.action
-    participant UseCase as usecase/auth/signup.usecase
+    participant UseCase as usecase/auth/signup-usecase
     participant RepoInterface as domain/repositories
     participant RepoImpl as infrastructure/auth-repository-impl
     participant Lib as lib/supabase
@@ -196,12 +196,11 @@ sequenceDiagram
     User->>Form: 入力・送信
     Form->>Action: signupAction(formData)
 
-    Note over Action: AuthRepositoryImpl を生成して SignupUseCase に渡す
-    Action->>UseCase: new SignupUseCase(new AuthRepositoryImpl())
-    Action->>UseCase: execute({ email, password })
+    Note over Action: infrastructure の signup を deps にまとめる
+    Action->>UseCase: signupUsecase({ email, password }, { signup })
     UseCase->>UseCase: バリデーション(utils/validation)
-    UseCase->>RepoInterface: authRepository.signup(input)
-    Note over UseCase,RepoImpl: 実体は Action が deps として渡した RepoImpl
+    UseCase->>RepoInterface: deps.signup(input)
+    Note over UseCase,RepoImpl: 実体は Action が deps として渡した RepoImpl の関数
     RepoImpl->>Lib: supabase.auth.signUp(...)
     Lib-->>RepoImpl: 結果
     RepoImpl-->>UseCase: User
@@ -211,9 +210,9 @@ sequenceDiagram
     Action-->>Form: SignupResult
 ```
 
-- **app（Action）** … Action 内で `AuthRepositoryImpl` を生成し、`SignupUseCase` のコンストラクタに渡す。usecase は「契約」だけを知っている。  
-- **usecase** … `AuthRepository` の**型（契約）**だけを知っており、`signup(input)` を呼ぶ。infra を import していない。  
-- **infrastructure** … `AuthRepository` を実装し、`lib/supabase` を呼ぶ。
+- **app（Action）** … Action 内で infrastructure の `signup` を import し、`deps` にまとめて `signupUsecase` に渡す。usecase は「契約」だけを知っている。  
+- **usecase** … `SignupDeps` の**型（契約）**だけを知っており、`deps.signup(input)` を呼ぶ。infra を import していない。  
+- **infrastructure** … `AuthRepository` の契約に沿った関数を実装し、`lib/supabase` を呼ぶ。
 
 ### 3.2 レシピ作成フロー — deps パターンの呼び出し関係
 

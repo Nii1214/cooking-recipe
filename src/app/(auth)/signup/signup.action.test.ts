@@ -2,8 +2,7 @@
 // npm run test:coverage -- --coverage.include='src/app/(auth)/signup/signup.action.ts' src/app/(auth)/signup/signup.action.test.ts
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { signupAction } from './signup.action';
-import { AuthRepository } from '@/domain/repositories/auth-repository';
-import { DIContainer } from '@/lib/di-container';
+import { signup } from '@/infrastructure/repositories/auth/auth-repository-impl';
 import { SignupResult } from '@/types/auth';
 import { redirect } from 'next/navigation';
 
@@ -14,6 +13,10 @@ vi.mock('next/navigation', () => ({
     err.digest = `NEXT_REDIRECT;replace;${path};307;`;
     throw err;
   }),
+}));
+
+vi.mock('@/infrastructure/repositories/auth/auth-repository-impl', () => ({
+  signup: vi.fn(),
 }));
 
 /**
@@ -50,22 +53,12 @@ function expectErrorResultExists(
 }
 
 describe('signupAction(サインアップ処理)', () => {
-  let mockRepository: AuthRepository;
-
   beforeEach(() => {
     vi.clearAllMocks();
-    DIContainer.resetForTesting();
-
-    mockRepository = {
-      login: vi.fn(),
-      signup: vi.fn(),
-    } as AuthRepository;
-
-    DIContainer.setAuthRepositoryForTesting(mockRepository);
   });
 
   it('サインアップ成功時に/signup/verify-emailへリダイレクトする', async () => {
-    vi.mocked(mockRepository.signup).mockResolvedValue({
+    vi.mocked(signup).mockResolvedValue({
       id: 'new-user-id',
       email: 'newuser@example.com',
       createdAt: new Date('2024-01-01'),
@@ -78,7 +71,7 @@ describe('signupAction(サインアップ処理)', () => {
     await expect(signupAction(null, formData)).rejects.toThrow('NEXT_REDIRECT');
     expect(vi.mocked(redirect)).toHaveBeenCalledWith('/signup/verify-email');
 
-    expect(mockRepository.signup).toHaveBeenCalledWith({
+    expect(signup).toHaveBeenCalledWith({
       email: 'newuser@example.com',
       password: 'password123',
     });
@@ -90,7 +83,7 @@ describe('signupAction(サインアップ処理)', () => {
     const result = await signupAction(null, formData);
 
     expectErrorResult(result, 'メールアドレスの形式が正しくありません');
-    expect(mockRepository.signup).not.toHaveBeenCalled();
+    expect(signup).not.toHaveBeenCalled();
   });
 
   it('メールアドレス形式が不正な場合にバリデーションエラー', async () => {
@@ -101,7 +94,7 @@ describe('signupAction(サインアップ処理)', () => {
     const result = await signupAction(null, formData);
 
     expectErrorResult(result, 'メールアドレスの形式が正しくありません');
-    expect(mockRepository.signup).not.toHaveBeenCalled();
+    expect(signup).not.toHaveBeenCalled();
   });
 
   it('パスワードが7文字の場合にバリデーションエラー（境界値）', async () => {
@@ -112,11 +105,11 @@ describe('signupAction(サインアップ処理)', () => {
     const result = await signupAction(null, formData);
 
     expectErrorResult(result, 'パスワードは8文字以上で入力してください');
-    expect(mockRepository.signup).not.toHaveBeenCalled();
+    expect(signup).not.toHaveBeenCalled();
   });
 
   it('パスワードが8文字の場合に成功する（境界値）', async () => {
-    vi.mocked(mockRepository.signup).mockResolvedValue({
+    vi.mocked(signup).mockResolvedValue({
       id: 'test-id',
       email: 'test@example.com',
       createdAt: new Date(),
@@ -130,9 +123,7 @@ describe('signupAction(サインアップ処理)', () => {
   });
 
   it('予期しないエラー時にエラーハンドラーを通してメッセージを返す', async () => {
-    vi.mocked(mockRepository.signup).mockRejectedValue(
-      new Error('Supabase error')
-    );
+    vi.mocked(signup).mockRejectedValue(new Error('Supabase error'));
 
     const formData = new FormData();
     formData.append('email', 'test@example.com');

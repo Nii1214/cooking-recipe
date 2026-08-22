@@ -1,7 +1,7 @@
 import { RecipeDetailView } from "@/presentation/components/recipe/RecipeDetailView";
 import { getRecipeById } from "@/infrastructure/repositories/recipe/recipe-read-repository-impl";
 import { getRecipeDetailUsecase } from "@/usecase/recipe/get-recipe-detail-usecase";
-import { getPresignedImageUrl } from "@/lib/get-presigned-image-url";
+import { getSignedImageUrl } from "@/lib/get-signed-image-url";
 import { notFound } from "next/navigation";
 
 type Props = {
@@ -19,7 +19,7 @@ export default async function RecipeDetailPage({ params }: Props) {
   }
 
   const thumbnailUrl = recipe.thumbnailPath
-    ? await getPresignedImageUrl(recipe.thumbnailPath)
+    ? await getSignedImageUrl(recipe.thumbnailPath)
     : undefined;
 
   return (

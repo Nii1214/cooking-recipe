@@ -1,7 +1,20 @@
 import { LoginForm } from "@/presentation/components/auth/login-form";
 import { GuestLoginForm } from "@/presentation/components/auth/guest-login-form";
+import { ERROR_MESSAGES } from "@/constants/error-messages";
 
-export default function LoginPage() {
+type Props = {
+    searchParams: Promise<{ authError?: string }>;
+};
+
+/**
+ * ログイン画面
+ *
+ * @param searchParams `authError` が付いている場合は確認リンク失敗の案内を表示する
+ * @returns ログイン画面
+ */
+export default async function LoginPage({ searchParams }: Props) {
+    const { authError } = await searchParams;
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
             <div className="w-full max-w-md space-y-8">
@@ -9,6 +22,13 @@ export default function LoginPage() {
                     <h1 className="text-center text-3xl font-bold text-gray-900">ログイン</h1>
                     <p className="mt-2 text-center text-sm text-gray-600">アカウントにログイン</p>
                 </div>
+                {authError && (
+                    <div className="rounded-md border border-rose-200 bg-rose-50 p-4">
+                        <p className="text-sm text-rose-800">
+                            {ERROR_MESSAGES.EMAIL_CONFIRM_LINK_INVALID}
+                        </p>
+                    </div>
+                )}
                 <div className="bg-white py-8 px-6 shadow rounded-lg">
                     <LoginForm />
                     <div className="relative my-6">

@@ -125,12 +125,12 @@ describe("createRecipeAction", () => {
 
     await createRecipeAction({
       ...formData,
-      thumbnailPath: "recipes/user-1/img.jpg",
+      thumbnailPath: "user-1/img.webp",
       ingredients: [{ name: "塩", quantity: "0", unit: "g", order: undefined as never }],
     });
 
     const input = vi.mocked(createRecipeUsecase).mock.calls[0][0];
-    expect(input.thumbnailPath).toBe("recipes/user-1/img.jpg");
+    expect(input.thumbnailPath).toBe("user-1/img.webp");
     expect(input.ingredients[0].quantityValue).toBeUndefined();
     expect(input.ingredients[0].order).toBe(0);
   });

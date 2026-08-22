@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, BookOpen, Search, Calendar } from "lucide-react";
+import { Plus, BookOpen, Search, Calendar, ShoppingCart } from "lucide-react";
 
 type Props = {
   recipeCount: number;
@@ -21,15 +21,10 @@ export function TopHero({ recipeCount }: Props) {
 
       <div className="relative w-full max-w-5xl mx-auto px-4 pt-10 pb-12 sm:pt-14 sm:pb-16">
         {/* メインコピー */}
-        <div className="text-center space-y-4 mb-10">
+        <div className="text-center mb-10">
           <h1 className="text-3xl sm:text-4xl font-bold text-white font-serif tracking-wide">
-            家族の味を、ここに残そう
+            家族のレシピ帳
           </h1>
-          <p className="text-emerald-100 text-sm sm:text-base max-w-md mx-auto leading-relaxed">
-            おばあちゃんの煮物、パパの特製カレー、週末のホットケーキ——
-            <br className="hidden sm:block" />
-            大切な家族のレシピを、みんなで守り、つないでいく場所です。
-          </p>
         </div>
 
         {/* 統計カード */}
@@ -38,9 +33,7 @@ export function TopHero({ recipeCount }: Props) {
             <p className="text-2xl sm:text-3xl font-bold text-white">
               {recipeCount}
             </p>
-            <p className="text-emerald-200 text-xs sm:text-sm mt-1">
-              レシピ数
-            </p>
+            <p className="text-emerald-200 text-xs sm:text-sm mt-1">レシピ数</p>
           </div>
           <div className="bg-white/15 backdrop-blur-sm rounded-xl p-3 sm:p-4 text-center border border-white/20">
             <p className="text-2xl sm:text-3xl font-bold text-white">—</p>
@@ -95,9 +88,9 @@ export function QuickAccessSection() {
           badge="実装予定"
         />
         <QuickAccessCard
-          icon={<BookOpen className="w-5 h-5 text-rose-600" />}
-          title="家族のストーリー"
-          description="レシピにまつわる思い出を記録します"
+          icon={<ShoppingCart className="w-5 h-5 text-rose-600" />}
+          title="買い物リスト"
+          description="家族全員で買い物リストを管理できます"
           badge="実装予定"
         />
       </div>

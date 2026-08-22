@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import type { RecipeSummaryWithFavorite } from "@/types/recipe";
 import { RecipeCard } from "./RecipeCard";
-import { Plus, Heart, LayoutGrid } from "lucide-react";
+import { Plus, Heart, LayoutGrid, Notebook } from "lucide-react";
 
 type Props = {
   recipes: RecipeSummaryWithFavorite[];
@@ -73,10 +73,12 @@ export function RecipeListPage({ recipes: initialRecipes }: Props) {
       {displayedRecipes.length === 0 ? (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
           <div className="text-center py-20 space-y-5">
-            <div className="w-20 h-20 mx-auto rounded-full bg-emerald-50 flex items-center justify-center">
-              <span className="text-4xl">
-                {showFavoritesOnly ? "💚" : "🍳"}
-              </span>
+            <div className="w-16 h-16 mx-auto rounded-full bg-emerald-50 flex items-center justify-center">
+              {showFavoritesOnly ? (
+                <Heart className="w-6 h-6 text-emerald-600" />
+              ) : (
+                <Notebook className="w-6 h-6 text-emerald-600" />
+              )}
             </div>
             <div className="space-y-2">
               <p className="text-gray-700 text-lg font-medium">

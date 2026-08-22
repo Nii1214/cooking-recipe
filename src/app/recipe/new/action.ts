@@ -1,7 +1,7 @@
 "use server";
 
 /**
- * レシピ本文・材料・手順の保存。サムネイルの S3 保存は別 Action（画像の流れは下記）。
+ * レシピ本文・材料・手順の保存。サムネイルの Storage 保存は別 Action（画像の流れは下記）。
  * @see src/app/recipe/new/レシピ新規と画像.md
  */
 
@@ -20,7 +20,7 @@ export type CreateRecipeFormData = {
   servingCount: number;
   preparationTimeMinutes: number;
   isDraft: boolean;
-  /** S3 にアップロード済みの画像パス（例: recipes/user-id/uuid.jpg）。未選択の場合は undefined */
+  /** Storage にアップロード済みの画像パス（例: user-id/uuid.webp）。未選択の場合は undefined */
   thumbnailPath?: string;
   categoryIds: string[];
   ingredients: Array<{

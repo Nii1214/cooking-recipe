@@ -6,7 +6,7 @@ import {
   getCategoriesForSearchFilter,
 } from "@/infrastructure/repositories/recipe/recipe-read-repository-impl";
 import { searchRecipeSummaries } from "@/usecase/recipe/search-recipe-summaries-usecase";
-import { getPresignedImageUrl } from "@/lib/get-presigned-image-url";
+import { getSignedImageUrl } from "@/lib/get-signed-image-url";
 import type { RecipeSearchQuery } from "@/domain/models/recipe/recipe-search-query";
 
 export const metadata: Metadata = {
@@ -85,7 +85,7 @@ async function fetchSearchResultsWithUrls(query: RecipeSearchQuery) {
     recipes.map(async (recipe) => ({
       ...recipe,
       thumbnailUrl: recipe.thumbnailPath
-        ? await getPresignedImageUrl(recipe.thumbnailPath)
+        ? await getSignedImageUrl(recipe.thumbnailPath)
         : undefined,
     })),
   );

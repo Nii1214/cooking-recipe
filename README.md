@@ -198,7 +198,7 @@ npm install
 
 # 3. 環境変数を設定
 cp .env.example .env.local
-# .env.local に Supabase / AWS の値を記入（詳細は .env.example 参照）
+# .env.local に Supabase の値を記入（詳細は .env.example 参照）
 
 # 4. 開発サーバーを起動
 npm run dev
@@ -281,7 +281,5 @@ npm run test:run
 
 ## Security
 
-- AWS IAMユーザーで運用
-- ルートユーザーは日常利用しない
-- IAM / Root ユーザーにMFAを設定
-- シークレットは環境変数で管理
+- レシピ画像は非公開の Supabase Storage + 署名 URL + RLS
+- シークレットは環境変数で管理（Vercel / `.env.local`）

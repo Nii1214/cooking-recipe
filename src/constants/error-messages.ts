@@ -19,6 +19,9 @@ export const ERROR_MESSAGES = {
     SIGNUP_FAILED: 'ユーザー作成に失敗しました',
     GUEST_LOGIN_FAILED: 'ゲストログインに失敗しました',
     
+    // メール確認エラー
+    EMAIL_CONFIRM_LINK_INVALID: '確認リンクが無効か、有効期限が切れています。お手数ですが、もう一度お試しください',
+
     // セッションエラー
     SESSION_EXPIRED: 'セッションの有効期限が切れました。再度ログインしてください',
     SESSION_NOT_FOUND: 'セッションが見つかりません。再度ログインしてください',

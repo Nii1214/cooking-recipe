@@ -1,7 +1,8 @@
 'use server';
 
 import { getAuthErrorMessage } from "@/infrastructure/utils/auth-error-handler";
-import { DIContainer } from "@/lib/di-container";
+import { signInAnonymously } from "@/infrastructure/repositories/auth/auth-repository-impl";
+import { guestLoginUsecase } from "@/usecase/auth/guest-login-usecase";
 import { GuestLoginResult } from "@/types/auth";
 import { redirect } from "next/navigation";
 import { isRedirectError } from "@/utils/redirect";
@@ -14,10 +15,8 @@ import { isRedirectError } from "@/utils/redirect";
 export async function guestLoginAction(
     _prevState: GuestLoginResult | null,
 ): Promise<GuestLoginResult> {
-    const useCase = DIContainer.getGuestLoginUseCase();
-
     try {
-        const result = await useCase.execute();
+        const result = await guestLoginUsecase({ signInAnonymously });
 
         if (result.success) {
             redirect('/top');

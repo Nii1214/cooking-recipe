@@ -2,8 +2,7 @@
 // npm run test:coverage -- --coverage.include='src/app/(auth)/login/login.action.ts' src/app/(auth)/login/login.action.test.ts
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { loginAction } from "./login.action";
-import { AuthRepository } from "@/domain/repositories/auth-repository";
-import { DIContainer } from "@/lib/di-container";
+import { login } from "@/infrastructure/repositories/auth/auth-repository-impl";
 import { LoginResult } from "@/types/auth";
 import { redirect } from "next/navigation";
 
@@ -14,6 +13,10 @@ vi.mock('next/navigation', () => ({
         err.digest = `NEXT_REDIRECT;replace;${path};307;`;
         throw err;
     }),
+}));
+
+vi.mock('@/infrastructure/repositories/auth/auth-repository-impl', () => ({
+    login: vi.fn(),
 }));
 
 /**
@@ -50,23 +53,12 @@ function expectErrorResultExists(
 }
 
 describe('loginAction(ログイン処理)', () => {
-    let mockRepository: AuthRepository;
-
     beforeEach(() => {
         vi.clearAllMocks();
-        DIContainer.resetForTesting();
-
-        mockRepository = {
-            login: vi.fn(),
-            signup: vi.fn(),
-        } as AuthRepository;
-
-        DIContainer.setAuthRepositoryForTesting(mockRepository);
     });
 
     it('ログイン成功時に/topへリダイレクトする', async () => {
-        // Repositoryのモックを設定
-        vi.mocked(mockRepository.login).mockResolvedValue({
+        vi.mocked(login).mockResolvedValue({
             id: 'test-id',
             email: 'test@example.com',
             createdAt: new Date('2024-01-01')
@@ -79,17 +71,14 @@ describe('loginAction(ログイン処理)', () => {
         await expect(loginAction(null, formData)).rejects.toThrow('NEXT_REDIRECT');
         expect(vi.mocked(redirect)).toHaveBeenCalledWith('/top');
 
-        expect(mockRepository.login).toHaveBeenCalledWith({
+        expect(login).toHaveBeenCalledWith({
             email: 'test@example.com',
             password: 'password123',
         });
     });
 
     it('ログイン失敗時にエラーメッセージを返す', async () => {
-        // Repositoryレベルでエラーをスロー
-        vi.mocked(mockRepository.login).mockRejectedValue(
-            new Error('invalid_credentials')
-        );
+        vi.mocked(login).mockRejectedValue(new Error('invalid_credentials'));
 
         const formData = new FormData();
         formData.append('email', 'wrong@example.com');
@@ -101,7 +90,7 @@ describe('loginAction(ログイン処理)', () => {
     });
 
     it('メールアドレス形式が不正な場合にバリデーションエラー', async () => {
-        // UseCaseでバリデーションされるため、Repositoryは呼ばれない
+        // usecase でバリデーションされるため、リポジトリは呼ばれない
         const formData = new FormData();
         formData.append('email', 'invalid-email');
         formData.append('password', 'password123');
@@ -109,9 +98,7 @@ describe('loginAction(ログイン処理)', () => {
         const result = await loginAction(null, formData);
 
         expectErrorResult(result, 'メールアドレスの形式が正しくありません');
-
-        // Repositoryが呼ばれていないことを検証
-        expect(mockRepository.login).not.toHaveBeenCalled();
+        expect(login).not.toHaveBeenCalled();
     });
 
     it('パスワードが空の場合にバリデーションエラー', async () => {
@@ -122,7 +109,7 @@ describe('loginAction(ログイン処理)', () => {
         const result = await loginAction(null, formData);
 
         expectErrorResult(result, 'パスワードを入力してください');
-        expect(mockRepository.login).not.toHaveBeenCalled();
+        expect(login).not.toHaveBeenCalled();
     });
 
     it('FormDataが空の場合にバリデーションエラー', async () => {
@@ -131,13 +118,11 @@ describe('loginAction(ログイン処理)', () => {
         const result = await loginAction(null, formData);
 
         expect(result.success).toBe(false);
-        expect(mockRepository.login).not.toHaveBeenCalled();
+        expect(login).not.toHaveBeenCalled();
     });
 
     it('予期しないエラー時にエラーハンドラーを通してメッセージを返す', async () => {
-        vi.mocked(mockRepository.login).mockRejectedValue(
-            new Error('Database error')
-        );
+        vi.mocked(login).mockRejectedValue(new Error('Database error'));
 
         const formData = new FormData();
         formData.append('email', 'test@example.com');

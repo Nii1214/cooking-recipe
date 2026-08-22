@@ -54,7 +54,6 @@ const FORBIDDEN = {
     // lib は @/lib/utils（cn 等の純 UI ヘルパ）のみ可。Supabase 等は個別に禁止
     pathGroup("@/lib/supabase", "presentation は Supabase（@/lib/supabase）を直接 import できません。app 層を経由してください（クリーンアーキテクチャ）"),
     pathGroup("@/lib/get-presigned-image-url", "presentation は @/lib/get-presigned-image-url を import できません。app 層を経由してください（クリーンアーキテクチャ）"),
-    pathGroup("@/lib/di-container", "presentation は @/lib/di-container を import できません（クリーンアーキテクチャ）"),
   ],
 };
 

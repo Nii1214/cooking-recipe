@@ -7,7 +7,7 @@ import {
   TopHero,
   QuickAccessSection,
 } from "@/presentation/components/recipe/TopHero";
-import { getPresignedImageUrl } from "@/lib/get-presigned-image-url";
+import { getSignedImageUrl } from "@/lib/get-signed-image-url";
 import { ToastFromSearchParams } from "@/presentation/components/ToastFromSearchParams";
 import { createAuthedClient } from "@/lib/supabase/server";
 import { findProfileByUserId } from "@/infrastructure/repositories/profile/profile-repository-impl";
@@ -24,7 +24,7 @@ async function fetchRecipesWithUrls() {
     recipes.map(async (recipe) => ({
       ...recipe,
       thumbnailUrl: recipe.thumbnailPath
-        ? await getPresignedImageUrl(recipe.thumbnailPath)
+        ? await getSignedImageUrl(recipe.thumbnailPath)
         : undefined,
     }))
   );

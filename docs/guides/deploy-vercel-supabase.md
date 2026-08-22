@@ -21,7 +21,6 @@
 
 - [Vercel](https://vercel.com) アカウント
 - [Supabase](https://supabase.com) アカウント
-- [AWS](https://aws.amazon.com) アカウント（レシピサムネイル用 S3。未設定でも他機能は動作）
 - GitHub リポジトリへのアクセス権
 - ローカルに Supabase CLI（`npm install` で devDependencies に含まれる）
 
@@ -90,22 +89,13 @@ Dashboard → **Project Settings** → **API**
 
 ---
 
-## 2. AWS S3（サムネイル用・任意）
+## 2. レシピ画像（Supabase Storage）
 
-レシピサムネイルのアップロードに使用します。未設定の場合、一覧・詳細は動きますがアップロードは失敗します。
+サムネイルは Supabase Storage の `recipe-images` バケットに保存します。マイグレーション適用でバケットと RLS が作られるため、Vercel への追加環境変数は不要です。
 
-1. S3 バケットを作成（例: `cooking-recipe-thumbnails-prod`）
-2. IAM ユーザーを作成し、当該バケットへの `PutObject` / `GetObject` 権限を付与
-3. アクセスキーを発行
+詳細: [画像アップロード（Supabase Storage）](../tips/image-upload-with-supabase-storage.md)
 
-Vercel に以下を設定:
-
-| 変数名 | 例 |
-|--------|-----|
-| `AWS_REGION` | `ap-northeast-1` |
-| `AWS_S3_BUCKET_NAME` | `cooking-recipe-thumbnails-prod` |
-| `AWS_ACCESS_KEY_ID` | （IAM ユーザーのキー） |
-| `AWS_SECRET_ACCESS_KEY` | （IAM ユーザーのシークレット） |
+旧 AWS S3 を使っていた場合、コンソール上のバケットと IAM ユーザーは削除して構いません。
 
 ---
 
@@ -127,10 +117,6 @@ Vercel に以下を設定:
 | `NEXT_PUBLIC_SUPABASE_URL` | o | o | o |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | o | o | o |
 | `NEXT_PUBLIC_SITE_URL` | o | - | - |
-| `AWS_REGION` | o | o | - |
-| `AWS_S3_BUCKET_NAME` | o | o | - |
-| `AWS_ACCESS_KEY_ID` | o | o | - |
-| `AWS_SECRET_ACCESS_KEY` | o | o | - |
 
 - **Production** … `main` マージ時
 - **Preview** … `develop` や PR ごとのプレビュー URL
@@ -174,7 +160,7 @@ Vercel に以下を設定:
 - [ ] プロフィール作成（`/profile/new`）
 - [ ] 家族グループ作成（`/family`）
 - [ ] レシピ登録・一覧・検索
-- [ ] （S3 設定済みの場合）サムネイルアップロード
+- [ ] サムネイルアップロード（Supabase Storage）
 - [ ] （ゲストログイン有効時）ゲストで試す → レシピ登録
 - [ ] （ゲスト削除バッチ）`npx supabase db push` 後、Dashboard → Cron Jobs に `cleanup-anonymous-users` がある
 

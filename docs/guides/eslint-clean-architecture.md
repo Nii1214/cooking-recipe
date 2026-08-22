@@ -18,7 +18,7 @@
 | **domain** | `src/domain/**` | `@/app`, `@/presentation`, `@/usecase`, `@/infrastructure`, `@/lib`, **`@/types`, `@/utils`, `@/constants`** | **error** |
 | **usecase** | `src/usecase/**` | `@/app`, `@/presentation`, `@/infrastructure`, `@/lib` | **error** |
 | **infrastructure** | `src/infrastructure/**` | `@/app`, `@/presentation`, `@/usecase` | warn |
-| **presentation** | `src/presentation/**` | `@/usecase`, `@/infrastructure`, `@/lib/supabase`, `@/lib/get-presigned-image-url`, `@/lib/di-container`（**`@/lib/utils` は可**：`cn` 等の UI ヘルパ） | warn |
+| **presentation** | `src/presentation/**` | `@/usecase`, `@/infrastructure`, `@/lib/supabase`, `@/lib/get-signed-image-url`（**`@/lib/utils` は可**：`cn` 等の UI ヘルパ） | warn |
 
 - **domain** は **types / utils / constants にも依存しません**。ドメインは「型・インターフェース・契約」のみで自己完結させ、フレームワークやアプリ固有のユーティリティに依存しない設計にしています。
 - **usecase** は domain と types / utils / constants のみ依存可。infrastructure は deps で受け取ります。

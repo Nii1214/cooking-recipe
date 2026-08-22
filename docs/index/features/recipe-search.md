@@ -40,7 +40,7 @@
 |------|------|------|---------------|------|
 | `src/domain/models/recipe/recipe-summary.ts` | model | 共用 | `RecipeSummary` | 結果のベース型（`recipe-top` でも使用） |
 | `src/types/recipe.ts` | types | 共用 | `RecipeSummaryWithFavorite` | お気に入り・サムネ URL 付き表示型（`recipe-top` でも使用） |
-| `src/lib/get-presigned-image-url.ts` | lib | 共用 | `getPresignedImageUrl` | サムネイル URL 生成（`recipe-top`, `recipe-detail` でも使用） |
+| `src/lib/get-signed-image-url.ts` | lib | 共用 | `getSignedImageUrl` | サムネイル署名 URL 生成（`recipe-top`, `recipe-detail` でも使用） |
 | `src/app/recipe/search/page.tsx` | page | 専用 | | 各結果に `thumbnailUrl` を付与 |
 | `src/presentation/components/recipe/RecipeListPage.tsx` | component | 共用 | `RecipeListPage` | カード一覧（`recipe-top` でも使用） |
 | `src/presentation/components/recipe/RecipeCard.tsx` | component | 共用 | `RecipeCard` | レシピ 1 件のカード（`recipe-top` でも使用） |

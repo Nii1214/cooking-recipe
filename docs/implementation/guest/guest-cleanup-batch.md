@@ -19,7 +19,7 @@
 
 ## スコープ外
 
-- S3 サムネイルの孤立ファイル削除
+- Storage サムネイルの孤立ファイル削除
 - 作成から N 時間未満だけ残す猶予ロジック（現状は実行時点の全ゲスト削除）
 - Vercel Cron / Auth Admin API / `service_role`
 

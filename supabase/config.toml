@@ -107,11 +107,11 @@ enabled = true
 # The maximum file size allowed (e.g. "5MB", "500KB").
 file_size_limit = "50MiB"
 
-# recipe-images バケット（レシピのサムネイル画像を格納）
+# recipe-images バケット（レシピのサムネイル画像を格納。保存前に WebP へ変換する）
 [storage.buckets.recipe-images]
-public = true
+public = false
 file_size_limit = "5MiB"
-allowed_mime_types = ["image/png", "image/jpeg", "image/webp", "image/gif"]
+allowed_mime_types = ["image/webp"]
 
 # Allow connections via S3 compatible clients
 [storage.s3_protocol]

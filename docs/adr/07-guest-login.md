@@ -340,7 +340,7 @@ Q1 / Q2 を踏まえ、案 A 採用時は次を前提とする。
 - **Supabase pg_cron + SQL 関数** `public.cleanup_anonymous_users()` で `is_anonymous = true` の全ユーザーを削除（6 時間おき）
 - `auth.users` 削除により、`profiles` / `recipes` / `family_members` / `families`（オーナー時）等が CASCADE
 - **Vercel / Auth Admin API / `service_role` は不使用**（プロジェクト方針に合わせ Supabase 内で完結）
-- S3 サムネイルの孤立ファイル削除は別途検討（第 2 段階）
+- Storage サムネイルの孤立ファイル削除は別途検討（第 2 段階）
 - 本登録（Identity Linking）済みユーザーは `is_anonymous = false` のため対象外
 
 運用手順: [ゲストユーザー削除バッチ — 運用手順書](../guides/guest-cleanup-batch-operations.md)

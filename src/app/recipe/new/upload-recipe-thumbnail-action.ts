@@ -4,7 +4,7 @@
  * サムネイル保存の入口。全体の読み方:
  * @see src/app/recipe/new/レシピ新規と画像.md
  *
- * 処理の流れ: 認証・レート制限・監査 → usecase（ルール）→ infrastructure（S3 Put）
+ * 処理の流れ: 認証・レート制限・監査 → usecase（ルール・リサイズ）→ infrastructure（Storage Put）
  */
 
 import { createAuthedClient } from "@/lib/supabase/server";
@@ -12,6 +12,7 @@ import {
   assertRecipeThumbnailUploadRateLimit,
   logRecipeThumbnailUploadAudit,
 } from "@/lib/recipe-thumbnail-upload-controls";
+import { recipeThumbnailImageProcessorImpl } from "@/infrastructure/image/recipe-thumbnail-image-processor-impl";
 import { recipeThumbnailStorageImpl } from "@/infrastructure/storage/recipe-thumbnail-storage-impl";
 import { uploadRecipeThumbnailUsecase } from "@/usecase/recipe/upload-recipe-thumbnail-usecase";
 
@@ -22,7 +23,10 @@ export type UploadRecipeThumbnailActionResult =
   | { success: false; error: string };
 
 /**
- * レシピサムネイルをサーバー経由で S3 に保存する。
+ * レシピサムネイルをサーバー経由で Supabase Storage に保存する。
+ *
+ * @param formData `file` フィールドに画像を含むフォーム
+ * @returns 成功時は保存パス、失敗時はエラーメッセージ
  */
 export async function uploadRecipeThumbnailAction(
   formData: FormData,
@@ -90,9 +94,11 @@ export async function uploadRecipeThumbnailAction(
       authorId: userId,
       body,
       contentType: raw.type || "application/octet-stream",
-      originalFilename: raw.name,
     },
-    { storage: recipeThumbnailStorageImpl },
+    {
+      storage: recipeThumbnailStorageImpl,
+      imageProcessor: recipeThumbnailImageProcessorImpl,
+    },
   );
 
   if (!result.success) {

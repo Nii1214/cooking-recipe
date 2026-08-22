@@ -25,3 +25,18 @@ export const RECIPE_THUMBNAIL_UPLOAD_MAX_PER_WINDOW = 20;
 
 /** レート制限ウィンドウ（ミリ秒） */
 export const RECIPE_THUMBNAIL_UPLOAD_WINDOW_MS = 15 * 60 * 1000;
+
+/** Supabase Storage のレシピ画像バケット名 */
+export const RECIPE_THUMBNAIL_BUCKET = "recipe-images";
+
+/** 保存時に収める長辺の上限（px）。これより大きい辺だけ縮小する */
+export const RECIPE_THUMBNAIL_MAX_EDGE_PX = 1200;
+
+/** WebP 変換の品質（0–100） */
+export const RECIPE_THUMBNAIL_WEBP_QUALITY = 80;
+
+/** 保存後の Content-Type。入力形式に関わらず WebP に揃える */
+export const RECIPE_THUMBNAIL_STORED_CONTENT_TYPE = "image/webp";
+
+/** 保存後の拡張子 */
+export const RECIPE_THUMBNAIL_STORED_EXTENSION = "webp";
